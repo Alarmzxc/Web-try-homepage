@@ -1,19 +1,100 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
- <head style="text-align: center"><font color=0002FF size="5">
-    ALARMZXC的网页</font><br />
- </head>
- <body background="./MC.png">
-   <div style="background:#808088;
-     width:fit-content">
-     <font color=FFFFFF size="4" style="text-align: center">你好啊<br/>我是ALARMZXC<br/>这是一个无聊的网页<br/></font>
-     <img src="./hi.jpg" width="150" height="150"><br>
-     <font color=FFFFFF size="4">想看时间？点击</font>
-   </div>
-   <div style="
-       border:3px solid #fff;
-       width:fit-content">
-     <a href=runoob-test.html><font color=ff0000>现在时间</font></a>
-   </div>
- </body>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>ALARMZXC的网页</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: url("./MC.png") fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        .content-box {
+            background: rgba(128, 128, 136, 0.9);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .time-link {
+            border: 3px solid rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 10px 25px;
+            transition: all 0.3s ease;
+        }
+        .time-link:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        img {
+            margin: 15px 0;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        background: url("./MC.png") fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+    }
+    .content-box {
+        background: rgba(128, 128, 136, 0.6); /* 背景颜色和透明度 */
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        text-align: center;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px); /* 添加高斯模糊效果 */
+        -webkit-backdrop-filter: blur(10px); /* 兼容性支持 */
+    }
+    .time-link {
+        border: 3px solid rgba(255,255,255,0.8);
+        border-radius: 8px;
+        padding: 10px 25px;
+        transition: all 0.3s ease;
+    }
+    .time-link:hover {
+        background: rgba(255,255,255,0.1);
+        transform: translateY(-2px);
+    }
+    img {
+        margin: 15px 0;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+</style>
+</head>
+<body>
+    <div class="content-box">
+        <font color="#FFFFFF" size="4">
+            <h1 style="color:#0002FF; margin:0 0 10px 0">ALARMZXC的网页</h1>
+            你好啊<br/>
+            我是ALARMZXC<br/>
+            这是一个无聊的网页<br/>
+        </font>
+        <img src="./hi.jpg" width="150" height="150" alt="头像"><br>
+        <font color="#FFFFFF" size="4">想看时间？点击</font>
+    </div>
+    
+    <div class="time-link">
+        <a href="runoob-test.html" style="text-decoration:none">
+            <font color="#ff0000">现在时间</font>
+        </a>
+    </div>
+</body>
 </html>
