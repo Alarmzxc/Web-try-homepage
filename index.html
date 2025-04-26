@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>ALARMZXC的网页</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: url("./MC.png") fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        .content-box {
+            background: rgba(128, 128, 136, 0.9);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-bottom: 20px; /* 与下方按钮保持间距 */
+        }
+        .link-button { /* 为所有按钮创建一个通用样式 */
+            border: 3px solid rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 10px 25px;
+            transition: all 0.3s ease;
+            margin-top: 10px; /* 在按钮之间添加一些间距 */
+            display: inline-block; /* 使按钮可以并排或堆叠，并应用边距 */
+            background: rgba(128, 128, 136, 0.7); /* 添加轻微背景以提高可读性 */
+        }
+        .link-button:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        .link-button a { /* 确保链接填充整个按钮区域 */
+             text-decoration: none;
+             display: block; /* 让链接填满按钮 */
+        }
+        img {
+            margin: 15px 0;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+<!-- 第二个 style 块与第一个几乎重复，已合并到第一个 style 块中，并调整了 .content-box 的透明度 -->
+</head>
+<body>
+    <div class="content-box">
+        <font color="#FFFFFF" size="4">
+            <h1 style="color:#0002FF; margin:0 0 10px 0">ALARMZXC的网页</h1>
+            你好啊<br/>
+            我是ALARMZXC<br/>
+            这是一个无聊的网页<br/>
+        </font>
+        <img src="./hi.jpg" width="150" height="150" alt="头像"><br>
+        <font color="#FFFFFF" size="4">想看时间？点击下方按钮</font> <!-- 修改了这里的文本 -->
+    </div>
+
+    <!-- 时间链接按钮 -->
+    <div class="link-button">
+        <a href="runoob-test.html">
+            <font color="#ff0000" size="4">现在时间</font> <!-- 增加了字体大小 -->
+        </a>
+    </div>
+
+    <!-- 新增的简介按钮 -->
+    <div class="link-button">
+        <a href="deepseek_html and gemini人物介绍 - 张三.html">
+            <font color="#00FF00" size="4">简介</font> <!-- 使用绿色并增加字体大小 -->
+        </a>
+    </div>
+
+</body>
+</html>
