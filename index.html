@@ -22,32 +22,50 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             text-align: center;
-            margin-bottom: 20px; /* 与下方按钮保持间距 */
+            margin-bottom: 20px;
+            max-width: 600px;
+            width: 90%;
         }
-        .link-button { /* 为所有按钮创建一个通用样式 */
-            border: 3px solid rgba(255,255,255,0.8);
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            max-width: 600px;
+            width: 90%;
+        }
+        .link-button {
+            border: 3px solid rgba(255,255,255,0.5);
             border-radius: 8px;
             padding: 10px 25px;
             transition: all 0.3s ease;
-            margin-top: 10px; /* 在按钮之间添加一些间距 */
-            display: inline-block; /* 使按钮可以并排或堆叠，并应用边距 */
-            background: rgba(128, 128, 136, 0.7); /* 添加轻微背景以提高可读性 */
+            background: rgba(128, 128, 136, 0.5);
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
         }
         .link-button:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.2);
             transform: translateY(-2px);
         }
-        .link-button a { /* 确保链接填充整个按钮区域 */
-             text-decoration: none;
-             display: block; /* 让链接填满按钮 */
+        .link-button a {
+            text-decoration: none;
+            display: block;
         }
         img {
             margin: 15px 0;
             border-radius: 50%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+        @media (max-width: 500px) {
+            .buttons-container {
+                flex-direction: column;
+            }
+            .link-button {
+                width: 100%;
+            }
+        }
     </style>
-<!-- 第二个 style 块与第一个几乎重复，已合并到第一个 style 块中，并调整了 .content-box 的透明度 -->
 </head>
 <body>
     <div class="content-box">
@@ -58,21 +76,30 @@
             这是一个无聊的网页<br/>
         </font>
         <img src="./hi.jpg" width="150" height="150" alt="头像"><br>
-        <font color="#FFFFFF" size="4">想看时间？点击下方按钮</font> <!-- 修改了这里的文本 -->
+        <font color="#FFFFFF" size="4">请选择下方功能</font>
     </div>
 
-    <!-- 时间链接按钮 -->
-    <div class="link-button">
-        <a href="runoob-test.html">
-            <font color="#ff0000" size="4">现在时间</font> <!-- 增加了字体大小 -->
-        </a>
-    </div>
+    <div class="buttons-container">
+        <!-- 时间链接按钮 -->
+        <div class="link-button">
+            <a href="runoob-test.html">
+                <font color="#FFA07A" size="4">现在时间</font>
+            </a>
+        </div>
 
-    <!-- 新增的简介按钮 -->
-    <div class="link-button">
-        <a href="deepseek_html and gemini人物介绍 - 张三.html">
-            <font color="#00FF00" size="4">简介</font> <!-- 使用绿色并增加字体大小 -->
-        </a>
+        <!-- 简介按钮 -->
+        <div class="link-button">
+            <a href="deepseek_html and gemini人物介绍 - 张三.html">
+                <font color="#98FB98" size="4">简介</font>
+            </a>
+        </div>
+
+        <!-- 照片集按钮 -->
+        <div class="link-button">
+            <a href="photos.html">
+                <font color="#ADD8E6" size="4">照片集</font>
+            </a>
+        </div>
     </div>
 
 </body>
