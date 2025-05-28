@@ -1,106 +1,313 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN"> <!-- 设置语言为中文 -->
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="styles.css">
-    <title>ALARMZXC的网页</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            background: url("./MC.png") fixed;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: Arial, sans-serif;
-        }
-        .content-box {
-            background: rgba(128, 128, 136, 0.9);
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            text-align: center;
-            margin-bottom: 20px;
-            max-width: 600px;
-            width: 90%;
-        }
-        .buttons-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            max-width: 600px;
-            width: 90%;
-        }
-        .link-button {
-            border: 3px solid rgba(255,255,255,0.5);
-            border-radius: 8px;
-            padding: 10px 25px;
-            transition: all 0.3s ease;
-            background: rgba(128, 128, 136, 0.5);
-            flex: 1;
-            min-width: 120px;
-            text-align: center;
-        }
-        .link-button:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
-        .link-button a {
-            text-decoration: none;
-            display: block;
-        }
-        img {
-            margin: 15px 0;
-            border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        @media (max-width: 500px) {
-            .buttons-container {
-                flex-direction: column;
-            }
-            .link-button {
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8"> <!-- 设置字符编码为UTF-8，确保中文正常显示 -->
+  <title>ALARMZXC的网页</title> <!-- 页面标题 -->
+  <!-- 引入Font Awesome图标库，用于可能的图标显示，来自副本文件 -->
+  <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* CSS 样式区域 */
+    /* 重置默认的margin和padding，并设置box-sizing为border-box */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif; /* 设置默认字体 */
+    }
+
+    /* body样式：设置背景图、布局和整体外观 */
+    body {
+      /* 背景图片设置，来自副本文件 */
+      background: url('./background.png') no-repeat center center fixed;
+      background-size: cover; /* 背景图覆盖整个屏幕 */
+      height: 100vh; /* 设置body高度为视口高度 */
+      /* 使用CSS Grid布局，将页面分为两列 */
+      display: grid;
+      grid-template-columns: 1fr 2fr; /* 左列占1份，右列占2份 */
+      grid-template-rows: 1fr; /* 只有一行 */
+      gap: 20px; /* 网格项之间的间距 */
+      padding: 40px; /* body内边距 */
+      color: white; /* 默认文本颜色 */
+      overflow: hidden; /* 隐藏溢出内容，避免滚动条 */
+    }
+
+    /* 通用面板样式：设置圆角、内边距、高度、盒模型等 */
+    .panel {
+       border-radius: 20px; /* 圆角 */
+       padding: 30px; /* 内边距 */
+       height: 100%; /* 高度填充其网格区域 */
+       box-sizing: border-box; /* 盒模型包括内边距和边框 */
+       display: flex; /* 使用flexbox布局内部内容 */
+       flex-direction: column; /* flex项垂直排列 */
+    }
+
+    /* 左侧面板样式：个人信息 */
+    .left-panel {
+      background: rgba(255, 255, 255, 0.6); /* 半透明白色背景，来自副本文件 */
+      align-items: center; /* flex项水平居中 */
+      justify-content: center; /* flex项垂直居中 */
+      text-align: center; /* 文本居中 */
+    }
+
+    /* 左侧面板头像图片样式 */
+    .left-panel img {
+      /* 样式来自副本文件 */
+      width: 180px; /* 宽度 */
+      height: 180px; /* 高度 */
+      border-radius: 50%; /* 圆形头像 */
+      margin: 20px 0; /* 上下外边距 */
+      box-shadow: 0 0 10px black; /* 阴影效果 */
+    }
+
+    /* 左侧面板标题样式 */
+    .left-panel h1 {
+      /* 样式来自副本文件 */
+      color: #E0FFFF; /* 标题颜色 */
+      margin-bottom: 10px; /* 底部外边距 */
+    }
+
+    /* 左侧面板段落文本样式 */
+    .left-panel p {
+      /* 样式来自副本文件 */
+      font-size: 1.2em; /* 字体大小 */
+      /* text-align 已经在 .left-panel 中设置 */
+    }
+
+    /* 右侧面板样式：时间、日历和按钮 */
+    .right-panel {
+      background: rgba(255, 255, 255, 0.3); /* 半透明白色背景，来自副本文件 */
+      justify-content: space-around; /* flex项在主轴上均匀分布空间 */
+      gap: 20px; /* flex项（时间、日历、按钮容器）之间的间距 */
+    }
+
+    /* 时间显示区域样式，来自副本文件 */
+    .time {
+      display: flex; /* 使用flexbox布局内部内容 */
+      justify-content: center; /* flex项水平居中 */
+      align-items: center; /* flex项垂直居中 */
+      font-size: 4em; /* 字体大小 */
+      gap: 10px; /* 数字和冒号之间的间距 */
+    }
+
+    /* 时间显示中右侧的部分 (AM/PM 和 秒) */
+    .right-side {
+      display: flex;
+      flex-direction: column; /* 垂直排列 */
+      font-size: 1.2em;
+      margin-left: 10px; /* 与分钟之间的左外边距 */
+    }
+
+    /* 小时、分钟、秒钟数字样式 */
+    .hours,
+    .minutes,
+    .seconds {
+      font-weight: bold; /* 加粗 */
+    }
+
+    /* 时间显示中的冒号样式 */
+    .dots {
+      font-size: 1.5em;
+      color: #bbb; /* 颜色 */
+    }
+
+    /* 日历显示区域样式，来自副本文件 */
+    .calender {
+      font-size: 1.3em; /* 字体大小 */
+      margin-top: 15px; /* 顶部外边距 */
+      /* 文字渐变背景 */
+      background: -webkit-linear-gradient(90deg, #ae4af6, #ff98d1);
+      -webkit-background-clip: text; /* 渐变只应用于文字 */
+      -webkit-text-fill-color: transparent; /* 文字颜色设为透明，显示背景渐变 */
+      text-align: center; /* 文本居中 */
+    }
+
+    /* 按钮容器样式：包含所有跳转按钮 */
+    .buttons-container {
+        display: flex; /* 使用flexbox布局 */
+        flex-direction: column; /* flex项垂直排列 */
+        gap: 20px; /* 按钮之间的间距 */
+        margin-top: 20px; /* 顶部外边距 */
+        flex-grow: 1; /* 允许容器占据剩余空间 */
+        justify-content: center; /* 如果容器高度足够，将按钮组垂直居中 */
+    }
+
+    /* 通用按钮样式：应用于所有跳转链接 */
+    .action-button {
+      background-color: rgba(255, 255, 255, 0.6); /* 半透明白色背景，来自副本文件 */
+      padding: 15px 20px; /* 内边距 */
+      width: 250px; /* 设置固定的宽度 */
+      margin-left: auto; /* 可选：如果设置了最大宽度且容器比最大宽度宽，可以用margin让按钮居中 */
+      margin-right: auto; /* 可选：如果设置了最大宽度且容器比最大宽度宽，可以用margin让按钮居中 */
+      border-radius: 12px; /* 圆角 */
+      font-size: 1.3em; /* 字体大小 */
+      font-weight: bold; /* 加粗 */
+      text-align: center; /* 文本居中 */
+      cursor: pointer; /* 鼠标悬停时显示手型 */
+      transition: background 0.3s ease, transform 0.3s ease; /* 平滑过渡效果 */
+      text-decoration: none; /* 移除链接下划线 */
+      display: flex; /* 使用flexbox布局内部文字 */
+      justify-content: center; /* 文字水平居中 */
+      align-items: center; /* 文字垂直居中 */
+      color: #333; /* 默认文字颜色（稍深的灰色） */
+    }
+
+    /* 按钮悬停效果 */
+    .action-button:hover {
+      background-color: rgba(255, 255, 255, 0.8); /* 背景更亮 */
+      transform: translateY(-3px); /* 向上微移 */
+    }
+
+    /* 特定按钮文字颜色类，从原 index.html <font> 标签转换而来 */
+    .time-button { color: #8A2BE2; } /* 现在时间按钮颜色 */
+    .intro-button { color: #87CEEB; } /* 简介按钮颜色 */
+    .photos-button { color: #6A5ACD; } /* 照片集按钮颜色 */
+    .news-button { color: #FF0000; } /* 新闻按钮颜色 (示例，可调整) */
+
+
+    /* 响应式设计：当屏幕宽度小于900px时应用的样式 */
+    @media screen and (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr; /* 网格变为单列 */
+        grid-template-rows: auto auto; /* 行高根据内容自动调整 */
+        gap: 30px; /* 网格项间距 */
+        height: auto; /* body高度根据内容调整，不再固定为100vh */
+        overflow-y: auto; /* 如果内容溢出，允许垂直滚动 */
+        padding: 20px; /* 减小内边距 */
+      }
+
+      /* 面板在小屏幕下高度自适应，减小内边距 */
+      .left-panel, .right-panel {
+          height: auto;
+          padding: 20px;
+      }
+
+      /* 将右侧面板 (时间、按钮) 放在左侧面板上面 (order: -1) */
+      .right-panel {
+        order: -1;
+      }
+
+      /* 减小时间字体大小 */
+      .time {
+          font-size: 3em;
+      }
+
+      /* 减小头像大小和外边距 */
+      .left-panel img {
+          width: 120px;
+          height: 120px;
+          margin: 10px 0;
+      }
+
+       /* 减小标题字体大小 */
+       .left-panel h1 {
+          font-size: 1.5em;
+       }
+
+       /* 减小段落字体大小 */
+       .left-panel p {
+          font-size: 1em;
+       }
+
+       /* 减小按钮间距和顶部外边距 */
+       .buttons-container {
+           gap: 10px;
+           margin-top: 15px;
+       }
+
+       /* 减小按钮字体大小和内边距 */
+       .action-button {
+           font-size: 1em;
+           padding: 10px 15px;
+       }
+    }
+  </style>
 </head>
 <body>
-    <div class="content-box">
-        <font color="#FFFFFF" size="4">
-            <h1 style="color:#0002FF; margin:0 0 10px 0">ALARMZXC的网页</h1>
-            你好啊<br/>
-            我是ALARMZXC<br/>
-            这是一个无聊的网页<br/>
-        </font>
-        <img src="./hi.jpg" width="150" height="150" alt="头像"><br>
-        <font color="#FFFFFF" size="4">请选择下方功能</font>
+  <!-- 左侧面板：个人信息 (布局和内容来自副本文件，但样式整合) -->
+  <div class="panel left-panel">
+    <h1>ALARMZXC的网页</h1>
+    <img src="./avatar.gif" alt="头像"> <!-- 使用副本文件中的 avatar.gif -->
+    <p>你好啊<br>这里是ALARM<br>这是一个普通的网页</p> <!-- 使用副本文件中的文本 -->
+  </div>
+
+  <!-- 右侧面板：时间、日历和按钮 -->
+  <div class="panel right-panel">
+    <!-- 当前时间显示区域 (结构和样式来自副本文件) -->
+    <div class="time">
+      <span class="hours">00</span><span class="dots">:</span><span class="minutes">00</span>
+        <span class="seconds">00</span>
+      <div class="right-side">
+        <span class="period">AM</span>
+      </div>
     </div>
 
+    <!-- 日历显示区域 (结构和样式来自副本文件) -->
+    <div class="calender">
+      <span class="month-name">月</span>,
+      <span class="day-name">星期</span>
+      <span class="day-num">00</span>
+    </div>
+
+    <!-- 按钮容器 (整合了原 index.html 和副本文件的按钮) -->
     <div class="buttons-container">
-        <!-- 时间链接按钮 -->
-        <div class="link-button">
-            <a href="runoob-test.html">
-                <font color="#FFA07A" size="4">现在时间</font>
-            </a>
-        </div>
-
-        <!-- 简介按钮 -->
-        <div class="link-button">
-            <a href="deepseek_html and gemini人物介绍 - 张三.html">
-                <font color="#98FB98" size="4">简介</font>
-            </a>
-        </div>
-
-        <!-- 照片集按钮 -->
-        <div class="link-button">
-            <a href="photos.html">
-                <font color="#ADD8E6" size="4">照片集</font>
-            </a>
-        </div>
+        <!-- 原 index.html 中的按钮 (现在用 <a> 标签和通用样式实现) -->
+        <a href="runoob-test.html" class="action-button time-button">
+             具体时间
+        </a>
+        <a href="deepseek_html and gemini.html" class="action-button intro-button">
+             简介
+        </a>
+        <a href="photos.html" class="action-button photos-button">
+             照片集
+        </a>
+        <!-- 副本文件中的跳转按钮 (现在用 <a> 标签和通用样式实现) -->
+         <a href="https://newsnow.alarmandcxz.dpdns.org" class="action-button news-button">
+             今日热点
+        </a>
     </div>
+  </div>
 
+  <script>
+    // JavaScript 时钟和日历逻辑 (来自副本文件)
+    function updateClock() {
+      const now = new Date(); // 获取当前日期和时间
+      let h = now.getHours(); // 获取小时 (0-23)
+      let m = now.getMinutes(); // 获取分钟 (0-59)
+      let s = now.getSeconds(); // 获取秒 (0-59)
+      // 判断是 AM 还是 PM
+      let period = h >= 12 ? 'PM' : 'AM';
+
+      // 将24小时制转换为12小时制
+      if (h > 12) h = h % 12;
+      // 特殊处理午夜12点 (0小时)
+      if (h === 0) h = 12;
+
+
+      // 如果小时、分钟或秒小于10，前面加0
+      h = h < 10 ? "0" + h : h;
+      m = m < 10 ? "0" + m : m;
+      s = s < 10 ? "0" + s : s;
+
+      // 更新HTML中对应的时间元素
+      document.querySelector(".hours").innerHTML = h;
+      document.querySelector(".minutes").innerHTML = m;
+      document.querySelector(".seconds").innerHTML = s;
+      document.querySelector(".period").innerHTML = period;
+
+      // 更新日历元素
+      const day = now.toLocaleString("zh-CN", { weekday: "long" }); // 获取星期，如 "星期一"
+      const month = now.toLocaleString("zh-CN", { month: "short" }); // 获取月份，如 "1月"
+      const date = now.getDate(); // 获取日期（一个月中的第几天）
+
+      document.querySelector(".month-name").innerHTML = month;
+      document.querySelector(".day-name").innerHTML = day;
+      document.querySelector(".day-num").innerHTML = date;
+    }
+
+    // 每1000毫秒（1秒）调用一次 updateClock 函数，实现动态时钟
+    setInterval(updateClock, 1000);
+    // 页面加载后立即调用一次 updateClock，显示初始时间
+    updateClock();
+  </script>
 </body>
 </html>
