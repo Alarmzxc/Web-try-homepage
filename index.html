@@ -123,21 +123,22 @@
 
     /* 按钮容器样式：包含所有跳转按钮 */
     .buttons-container {
-        display: flex; /* 使用flexbox布局 */
-        flex-direction: column; /* flex项垂直排列 */
-        gap: 20px; /* 按钮之间的间距 */
+        display: grid; /* 更改为网格布局 */
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 创建自适应列数的网格，每列最小150px，最大占据剩余空间 */
+        gap: 15px; /* 按钮之间的间距 */
         margin-top: 20px; /* 顶部外边距 */
         flex-grow: 1; /* 允许容器占据剩余空间 */
-        justify-content: center; /* 如果容器高度足够，将按钮组垂直居中 */
+        justify-content: center; /* 如果容器宽度足够，将按钮组水平居中 */
     }
 
     /* 通用按钮样式：应用于所有跳转链接 */
     .action-button {
       background-color: rgba(255, 255, 255, 0.6); /* 半透明白色背景，来自副本文件 */
-      padding: 15px 20px; /* 内边距 */
-      width: 250px; /* 设置固定的宽度 */
+      padding: 24px 20px; /* 内边距 */
+      width: 150px; /* 设置固定的宽度 */
       margin-left: auto; /* 可选：如果设置了最大宽度且容器比最大宽度宽，可以用margin让按钮居中 */
       margin-right: auto; /* 可选：如果设置了最大宽度且容器比最大宽度宽，可以用margin让按钮居中 */
+      height: 200px; 
       border-radius: 12px; /* 圆角 */
       font-size: 1.3em; /* 字体大小 */
       font-weight: bold; /* 加粗 */
@@ -162,7 +163,7 @@
     .intro-button { color: #87CEEB; } /* 简介按钮颜色 */
     .photos-button { color: #6A5ACD; } /* 照片集按钮颜色 */
     .news-button { color: #FF0000; } /* 新闻按钮颜色 (示例，可调整) */
-
+    .blog-hexo { color: #6A5ACD; }
 
     /* 响应式设计：当屏幕宽度小于900px时应用的样式 */
     @media screen and (max-width: 900px) {
@@ -259,6 +260,9 @@
         </a>
         <a href="photos.html" class="action-button photos-button">
              照片集
+        </a>
+        <a href="photos.html" class="action-button blog-hexo">
+             参观博客
         </a>
         <!-- 副本文件中的跳转按钮 (现在用 <a> 标签和通用样式实现) -->
          <a href="https://newsnow.alarmandcxz.dpdns.org" class="action-button news-button">
