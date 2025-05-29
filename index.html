@@ -34,7 +34,8 @@
     /* 通用面板样式：设置圆角、内边距、高度、盒模型等 */
     .panel {
        border-radius: 20px; /* 圆角 */
-       padding: 30px; /* 内边距 */
+       /* 内边距已移至右侧面板的内部div */
+       /* padding: 30px; */
        height: 100%; /* 高度填充其网格区域 */
        box-sizing: border-box; /* 盒模型包括内边距和边框 */
        display: flex; /* 使用flexbox布局内部内容 */
@@ -43,10 +44,11 @@
 
     /* 左侧面板样式：个人信息 */
     .left-panel {
-      background: rgba(255, 255, 255, 0.6); /* 半透明白色背景，来自副本文件 */
+      background: rgba(255, 255, 255, 0.3); /* 半透明白色背景，来自副本文件 */
       align-items: center; /* flex项水平居中 */
       justify-content: center; /* flex项垂直居中 */
       text-align: center; /* 文本居中 */
+      padding: 30px; /* 左侧面板保留内边距 */
     }
 
     /* 左侧面板头像图片样式 */
@@ -75,32 +77,73 @@
 
     /* 右侧面板样式：时间、日历和按钮 */
     .right-panel {
-      background: rgba(255, 255, 255, 0.3); /* 半透明白色背景，来自副本文件 */
-      justify-content: space-around; /* flex项在主轴上均匀分布空间 */
-      gap: 20px; /* flex项（时间、日历、按钮容器）之间的间距 */
+      /* 外部面板仍然需要 flex 属性来垂直堆叠内部 div */
+      display: flex;
+      flex-direction: column;
+      /* 移除外部面板的内边距，移至内部 div */
+      padding: 0;
+      border-radius: 20px; /* 外部面板保留圆角 */
+    }
+
+    /* 顶部区域（时间与日历）的新容器 */
+    .right-panel-top {
+        background: rgba(25, 25, 25, 0.5); /* 半透明白色背景 */
+        border-radius: 20px 20px 0 0; /* 圆角只应用于顶部 */
+        padding: 30px; /* 在此处应用原始内边距 */
+        display: flex; /* 使用 flexbox 布局时间与日历 */
+        flex-direction: column; /* 垂直堆叠时间与日历 */
+        justify-content: space-around; /* 在时间与日历之间均匀分布空间 */
+        gap: 20px; /* 时间与日历之间的间距 */
+        flex-shrink: 0; /* 防止缩小 */
+        height: auto; /* 高度根据内容自适应 */
+    }
+
+    /* 底部区域（按钮）的新容器 */
+    .right-panel-bottom {
+        background: transparent; /* 完全透明背景 */
+        border-radius: 0 0 20px 20px; /* 圆角只应用于底部 */
+        padding: 30px; /* 在此处应用原始内边距 */
+        flex-grow: 1; /* 使其占据剩余空间 */
+        display: flex; /* 使用 flexbox 对齐按钮容器 */
+        flex-direction: column; /* 垂直堆叠按钮容器（虽然只有一个项目，但这是良好的实践） */
+        justify-content: center; /* 垂直居中按钮容器 */
+        align-items: center; /* 如果容器未占据全部宽度，则水平居中按钮容器 */
     }
 
     /* 时间显示区域样式，来自副本文件 */
     .time {
-      display: flex; /* 使用flexbox布局内部内容 */
-      justify-content: center; /* flex项水平居中 */
-      align-items: center; /* flex项垂直居中 */
+      display: flex; /* 使用flexbox排列内部内容 */
+      justify-content: center; /* 使 flex 项目水平居中 */
+      align-items: center; /* 使 flex 项目垂直居中 */
       font-size: 4em; /* 字体大小 */
-      gap: 10px; /* 数字和冒号之间的间距 */
+      gap: 10px; /* 数字与冒号之间的间距 */
     }
 
     /* 时间显示中右侧的部分 (AM/PM 和 秒) */
     .right-side {
       display: flex;
       flex-direction: column; /* 垂直排列 */
-      font-size: 1em;
+      /* 移除此设置，因为我们在子元素上直接设置了字体大小 */
+      /* font-size: 1em; */
       margin-left: 10px; /* 与分钟之间的左外边距 */
     }
 
-    /* 小时、分钟、秒钟数字样式 */
-    .hours,
-    .minutes,
+    /* AM/PM period style */
+    .period {
+        font-size: 1.5rem; /* 设置相对于根字体大小的特定字体大小 */
+        text-align: left; /* 文本左对齐 */
+    }
+
+    /* Seconds style */
     .seconds {
+        font-size: 1.5rem; /* 设置相对于根字体大小的特定字体大小 */
+        text-align: left; /* 文本左对齐 */
+        font-weight: bold; /* 保持字体加粗 */
+    }
+
+    /* 小时、分钟数字样式 (秒钟字体加粗已在上面设置) */
+    .hours,
+    .minutes {
       font-weight: bold; /* 加粗 */
     }
 
@@ -113,6 +156,7 @@
     /* 日历显示区域样式，来自副本文件 */
     .calender {
       font-size: 1.3em; /* 字体大小 */
+      /* 在新的顶部面板中，此外边距可能需要调整，但暂时保留 */
       margin-top: 15px; /* 顶部外边距 */
       /* 文字渐变背景 */
       background: -webkit-linear-gradient(90deg, #ae4af6, #ff98d1);
@@ -126,19 +170,23 @@
         display: grid; /* 更改为网格布局 */
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 创建自适应列数的网格，每列最小150px，最大占据剩余空间 */
         gap: 15px; /* 按钮之间的间距 */
-        margin-top: 20px; /* 顶部外边距 */
-        flex-grow: 1; /* 允许容器占据剩余空间 */
-        justify-content: center; /* 如果容器宽度足够，将按钮组水平居中 */
+        /* 此外边距现在由父元素 .right-panel-bottom 的内边距处理 */
+        /* margin-top: 20px; */
+        /* 这现在应用于父元素 .right-panel-bottom */
+        /* flex-grow: 1; */
+        justify-content: center; /* 如果容器足够宽，则水平居中按钮组 */
+        width: 100%; /* 使按钮容器占据父元素的全部宽度 */
+        max-width: 600px; /* 可选：限制最大宽度以实现居中 */
     }
 
     /* 通用按钮样式：应用于所有跳转链接 */
     .action-button {
-      background-color: rgba(255, 255, 255, 0.6); /* 半透明白色背景，来自副本文件 */
+      background-color: rgba(255, 255, 255, 0.5); /* 半透明白色背景，来自副本文件 */
       padding: 24px 20px; /* 内边距 */
       width: 150px; /* 设置固定的宽度 */
       margin-left: auto; /* 可选：如果设置了最大宽度且容器比最大宽度宽，可以用margin让按钮居中 */
       margin-right: auto; /* 可选：如果设置了最大宽度且容器比最大宽度宽，可以用margin让按钮居中 */
-      height: 200px; 
+      height: 180px;
       border-radius: 12px; /* 圆角 */
       font-size: 1.3em; /* 字体大小 */
       font-weight: bold; /* 加粗 */
@@ -161,9 +209,9 @@
     /* 特定按钮文字颜色类，从原 index.html <font> 标签转换而来 */
     .time-button { color: #8A2BE2; } /* 现在时间按钮颜色 */
     .intro-button { color: #87CEEB; } /* 简介按钮颜色 */
-    .photos-button { color: #6A5ACD; } /* 照片集按钮颜色 */
-    .news-button { color: #FF0000; } /* 新闻按钮颜色 (示例，可调整) */
-    .blog-hexo { color: #6A5ACD; }
+    .photos-button { color: #1E90FF; } /* 照片集按钮颜色 */
+    .news-button { color: #FF4500; } /* 新闻按钮颜色 (示例，可调整) */
+    .blog-hexo { color: #F5F5DC; } /* 博客按钮颜色 (示例，可调整) */
 
     /* 响应式设计：当屏幕宽度小于900px时应用的样式 */
     @media screen and (max-width: 900px) {
@@ -176,21 +224,46 @@
         padding: 20px; /* 减小内边距 */
       }
 
-      /* 面板在小屏幕下高度自适应，减小内边距 */
-      .left-panel, .right-panel {
+      /* 小屏幕下的左侧面板，高度自适应，减小内边边距 */
+      .left-panel {
           height: auto;
           padding: 20px;
       }
 
-      /* 将右侧面板 (时间、按钮) 放在左侧面板上面 (order: -1) */
+      /* 调整右侧面板新内部 div 的内边距 */
+      .right-panel-top,
+      .right-panel-bottom {
+          padding: 20px;
+      }
+
+      /* 小屏幕下调整顶部区域的圆角 */
+      .right-panel-top {
+         border-radius: 20px 20px 0 0; /* 保持顶部圆角 */
+      }
+
+       /* 小屏幕下调整底部区域的圆角 */
+       .right-panel-bottom {
+           border-radius: 0 0 20px 20px; /* 保持底部圆角 */
+       }
+
+
+      /* 将右侧面板（时间、按钮）置于左侧面板上方 (order: -1) */
       .right-panel {
         order: -1;
+        gap: 20px; /* 保持上下部分之间的间距 */
       }
 
       /* 减小时间字体大小 */
       .time {
           font-size: 3em;
       }
+
+      /* AM/PM 和秒的字体大小保持 1.5rem */
+      .period,
+      .seconds {
+          font-size: 1.5rem;
+      }
+
 
       /* 减小头像大小和外边距 */
       .left-panel img {
@@ -212,13 +285,18 @@
        /* 减小按钮间距和顶部外边距 */
        .buttons-container {
            gap: 10px;
-           margin-top: 15px;
+           /* 由 right-panel-bottom 的内边距处理 */
+           /* margin-top: 15px; */
+           /* 小屏幕下移除最大宽度限制 */
+           max-width: none;
        }
 
-       /* 减小按钮字体大小和内边距 */
+       /* 调整按钮字体大小和内边距，调整尺寸 */
        .action-button {
            font-size: 1em;
            padding: 10px 15px;
+           height: 150px; /* 小屏幕下调整按钮高度 */
+           width: 120px; /* 小屏幕下调整按钮宽度 */
        }
     }
   </style>
@@ -233,41 +311,47 @@
 
   <!-- 右侧面板：时间、日历和按钮 -->
   <div class="panel right-panel">
-    <!-- 当前时间显示区域 (结构和样式来自副本文件) -->
-    <div class="time">
-      <span class="hours">00</span><span class="dots">:</span><span class="minutes">00</span>
-      <div class="right-side">
-        <span class="period">AM</span>
-        <span class="seconds">00</span>
-      </div>
+    <!-- 右侧面板上部分：时间、日历 -->
+    <div class="right-panel-top">
+        <!-- 当前时间显示区域 (结构和样式来自副本文件) -->
+        <div class="time">
+          <span class="hours">00</span><span class="dots">:</span><span class="minutes">00</span>
+          <div class="right-side">
+            <span class="period">AM</span>
+            <span class="seconds">00</span>
+          </div>
+        </div>
+
+        <!-- 日历显示区域 (结构和样式来自副本文件) -->
+        <div class="calender">
+          <span class="month-name">月</span>,
+          <span class="day-name">星期</span>
+          <span class="day-num">00</span>
+        </div>
     </div>
 
-    <!-- 日历显示区域 (结构和样式来自副本文件) -->
-    <div class="calender">
-      <span class="month-name">月</span>,
-      <span class="day-name">星期</span>
-      <span class="day-num">00</span>
-    </div>
-
-    <!-- 按钮容器 (整合了原 index.html 和副本文件的按钮) -->
-    <div class="buttons-container">
-        <!-- 原 index.html 中的按钮 (现在用 <a> 标签和通用样式实现) -->
-        <a href="runoob-test.html" class="action-button time-button">
-             具体时间
-        </a>
-        <a href="deepseek_html and gemini.html" class="action-button intro-button">
-             简介
-        </a>
-        <a href="photos.html" class="action-button photos-button">
-             照片集
-        </a>
-        <a href="https://hexo.alarmandcxz.dpdns.org" class="action-button blog-hexo">
-             参观博客
-        </a>
-        <!-- 副本文件中的跳转按钮 (现在用 <a> 标签和通用样式实现) -->
-         <a href="https://newsnow.alarmandcxz.dpdns.org" class="action-button news-button">
-             今日热点
-        </a>
+    <!-- 右侧面板下部分：按钮 (完全透明) -->
+    <div class="right-panel-bottom">
+        <!-- 按钮容器 (整合了原 index.html 和副本文件的按钮) -->
+        <div class="buttons-container">
+            <!-- 原 index.html 中的按钮 (现在用 <a> 标签和通用样式实现) -->
+            <a href="runoob-test.html" class="action-button time-button">
+                 具体时间
+            </a>
+            <a href="deepseek_html and gemini.html" class="action-button intro-button">
+                 简介
+            </a>
+            <a href="photos.html" class="action-button photos-button">
+                 照片集
+            </a>
+            <a href="https://hexo.alarmandcxz.dpdns.org" class="action-button blog-hexo">
+                 参观博客
+            </a>
+            <!-- 副本文件中的跳转按钮 (现在用 <a> 标签和通用样式实现) -->
+             <a href="https://newsnow.alarmandcxz.dpdns.org" class="action-button news-button">
+                 今日热点
+            </a>
+        </div>
     </div>
   </div>
 

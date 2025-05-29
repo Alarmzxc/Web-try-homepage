@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>人物介绍 - 张三</title>
+    <title>人物介绍 - alarm</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --light-gray: #f8f9fa;
-            --border-color: #eee;
+            /* Changed to more vibrant colors */
+            --primary-color: #1abc9c; /* Turquoise */
+            --secondary-color: #f39c12; /* Orange */
+            --light-gray: #ecf0f1; /* Lighter gray for backgrounds */
+            --border-color: #bdc3c7; /* Slightly darker border */
             --animation-duration: 0.6s; /* Animation speed */
         }
 
@@ -22,8 +23,9 @@
 
         body {
             line-height: 1.6;
-            background-color: #f5f6fa;
-            padding: 2rem;
+            background-color: #e0e6e9; /* Slightly more vibrant body background */
+            padding: 2rem; /* Keep initial padding */
+            padding-top: 60px; /* Add padding to top to accommodate the fixed button */
         }
 
         .container {
@@ -51,9 +53,7 @@
         .profile-header .avatar,
         .profile-header .basic-info,
         .section,
-        .timeline-item,
-        .achievement-card,
-        .page-footer { /* Added footer to animation */
+        .achievement-card {
             animation: fadeInUp var(--animation-duration) ease-out forwards;
             opacity: 0; /* Start hidden before animation */
         }
@@ -61,22 +61,19 @@
         /* Stagger animations */
         .profile-header .avatar { animation-delay: 0.1s; }
         .profile-header .basic-info { animation-delay: 0.2s; }
-        .section:nth-of-type(1) { animation-delay: 0.3s; }
-        .section:nth-of-type(2) { animation-delay: 0.4s; }
-        .section:nth-of-type(3) { animation-delay: 0.5s; }
-        .section:nth-of-type(4) { animation-delay: 0.6s; }
-        /* Stagger timeline items and achievement cards if needed - finer control */
-        .timeline-item:nth-child(1) { animation-delay: 0.6s; }
-        .timeline-item:nth-child(2) { animation-delay: 0.7s; }
-        .achievements .achievement-card:nth-child(1) { animation-delay: 0.7s; }
-        .achievements .achievement-card:nth-child(2) { animation-delay: 0.8s; }
-        .page-footer { animation-delay: 0.9s; } /* Delay footer animation */
+        .section:nth-of-type(1) { animation-delay: 0.3s; } /* Introduction */
+        .section:nth-of-type(2) { animation-delay: 0.4s; } /* Gaming History */
+        .section:nth-of-type(3) { animation-delay: 0.5s; } /* Technical/Achievements */
+
+        /* Stagger achievement cards if needed */
+        .achievements .achievement-card:nth-child(1) { animation-delay: 0.6s; }
 
 
         .profile-header {
             display: flex;
             align-items: center;
             padding: 2rem;
+            /* Using vibrant colors for gradient */
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
         }
@@ -87,7 +84,7 @@
             border-radius: 50%;
             border: 5px solid white;
             margin-right: 2rem;
-            /* Removed animation from here, applied above */
+            object-fit: cover; /* Ensure image covers the circular area */
         }
 
         .basic-info h1 {
@@ -97,81 +94,21 @@
         .basic-info p {
             font-size: 1.1rem;
         }
-         /* Removed animation from basic-info, applied above */
-
 
         .section {
             padding: 2rem;
             border-bottom: 1px solid var(--border-color);
-             /* Removed animation from here, applied above */
         }
 
         .section:last-child {
-            border-bottom: none; /* Keep this for the last section */
+            border-bottom: none;
         }
 
         .section h2 {
-            color: var(--primary-color);
+            color: var(--primary-color); /* Using primary color for headings */
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--secondary-color);
-        }
-
-        .key-info p {
-            margin-bottom: 0.5rem; /* Add some spacing */
-        }
-
-
-        .timeline {
-            position: relative;
-            padding-left: 2rem;
-            margin-left: 1rem;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 5px; /* Adjusted top */
-            width: 2px;
-            height: calc(100% - 10px); /* Adjust height */
-            background: var(--secondary-color);
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding-left: 2rem;
-            transition: background-color 0.3s ease; /* Added transition for hover */
-            border-radius: 5px; /* Added for better hover effect */
-            padding: 1rem 1rem 1rem 2rem; /* Adjusted padding */
-            margin-left: -1rem; /* Adjust margin to align better */
-            /* Removed animation from here, applied above */
-        }
-        .timeline-item:last-child {
-            margin-bottom: 0; /* Remove bottom margin for the last item */
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -1.3rem; /* Relative to the item's padding-left now */
-            top: 15px; /* Adjust vertical alignment */
-            width: 12px;
-            height: 12px;
-            background: var(--secondary-color);
-            border-radius: 50%;
-            z-index: 1;
-        }
-
-        .timeline-item h3 {
-            color: var(--primary-color);
-            margin-bottom: 0.3rem;
-        }
-
-        /* Subtle hover effect for timeline items */
-        .timeline-item:hover {
-            background-color: var(--light-gray);
+            border-bottom: 2px solid var(--secondary-color); /* Using secondary for border */
         }
 
         .achievements {
@@ -182,51 +119,49 @@
 
         .achievement-card {
             padding: 1.5rem;
-            background: var(--light-gray);
+            background: var(--light-gray); /* Using lighter gray */
             border-radius: 10px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
-            /* Removed animation from here, applied above */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .achievement-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1); /* Enhanced hover shadow */
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15); /* Slightly stronger shadow on hover */
         }
         .achievement-card h3 {
-             color: var(--primary-color);
+             color: var(--primary-color); /* Using primary color for card headings */
              margin-bottom: 0.5rem;
         }
 
-        /* --- Footer and Back Button --- */
-        .page-footer {
-            padding: 2rem;
-            text-align: center;
-            border-top: 1px solid var(--border-color); /* Add separator line */
-            margin-top: 1rem; /* Add some space above footer */
-            background-color: #fdfdfd; /* Slightly different background */
-        }
-
+        /* --- Fixed Back Button --- */
         .back-button {
+            position: fixed; /* Make it fixed */
+            top: 15px; /* Distance from top */
+            left: 15px; /* Distance from left */
+            z-index: 1000; /* Ensure it's above other content */
+
             display: inline-block;
             padding: 0.8rem 1.5rem;
-            background-color: var(--secondary-color);
+            background-color: var(--secondary-color); /* Using secondary color */
             color: white;
             text-decoration: none;
             border-radius: 5px;
             font-size: 1rem;
             transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Add a subtle shadow */
         }
 
         .back-button:hover {
-            background-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: var(--primary-color); /* Using primary color on hover */
+            transform: scale(1.05); /* Slightly enlarge on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
 
         @media (max-width: 768px) {
             body {
                 padding: 1rem; /* Reduce padding on smaller screens */
+                padding-top: 70px; /* Adjust top padding for smaller screens */
             }
             .profile-header {
                 flex-direction: column;
@@ -244,80 +179,50 @@
              .section {
                 padding: 1.5rem; /* Reduce section padding */
             }
-            .timeline {
-                padding-left: 1rem;
-                margin-left: 0.5rem;
-            }
-            .timeline-item {
-                padding-left: 1.5rem;
-                 margin-left: -0.5rem;
-            }
-             .timeline-item::before {
-                 left: -1rem;
-            }
+
+             /* Adjust fixed button position on small screens if needed */
+             .back-button {
+                 top: 10px;
+                 left: 10px;
+                 padding: 0.6rem 1.2rem; /* Slightly smaller button */
+             }
         }
     </style>
 </head>
 <body>
+    <!-- Fixed Back Button - placed outside the container for fixed positioning relative to viewport -->
+    <a href="index.html" class="back-button">返回首页</a>
+
     <div class="container">
         <header class="profile-header">
-            <!-- Placeholder image, replace with actual path -->
-            <img src="avatar-placeholder.jpg" alt="张三" class="avatar">
+            <!-- Avatar -->
+            <img src="avatar.gif" alt="alarm" class="avatar">
             <div class="basic-info">
-                <h1>张三</h1>
-                <p>资深软件工程师 | 人工智能专家</p>
+                <h1>alarm</h1>
+                <p>一名普通的大学生</p>
             </div>
         </header>
 
         <section class="section">
             <h2>简介</h2>
-            <p>拥有10年以上软件开发经验的人工智能专家，专注于机器学习算法研究和产品化应用。在计算机视觉和自然语言处理领域有丰富实战经验，曾主导多个国家级人工智能项目。</p>
+            <p>你好，我是alarm，一名正在大学里努力学习的普通学生。我对电脑世界充满了好奇，平时最大的爱好就是沉浸在各种电脑游戏中。除此之外，我也对技术学习保持着一份热情，喜欢探索一些有趣的技术领域。</p>
         </section>
 
         <section class="section">
-            <h2>关键信息</h2>
-            <div class="key-info">
-                <p>🎂 出生日期：1990年5月15日</p>
-                <p>📍 国籍：中国</p>
-                <p>🎓 毕业院校：清华大学计算机系</p>
-                <p>🏆 知名作品：智能图像识别系统DeepVision</p>
-            </div>
+            <h2>游戏经历</h2>
+            <p>我的游戏经历或许算不上辉煌，但绝对称得上历史悠久。我是一名《生死狙击》十年老玩家，这款游戏陪伴了我很长时间。同时，我也是《Minecraft》的多年玩家，尤其喜欢在其中进行休闲生存，享受创造和探索的乐趣。</p>
         </section>
 
         <section class="section">
-            <h2>经历</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <h3>首席AI工程师 - ABC科技（2018-至今）</h3>
-                    <p>带领20人团队开发企业级AI解决方案，客户覆盖金融、医疗等多个领域</p>
-                </div>
-                <div class="timeline-item">
-                    <h3>高级研发工程师 - XYZ公司（2013-2018）</h3>
-                    <p>主导自然语言处理平台的架构设计与核心算法开发</p>
-                </div>
-                <!-- Add more timeline items here if needed -->
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>主要成就</h2>
+            <h2>技术与成就</h2>
             <div class="achievements">
                 <div class="achievement-card">
-                    <h3>国家级AI创新奖</h3>
-                    <p>2020年获得国家科技进步奖人工智能专项</p>
-                </div>
-                <div class="achievement-card">
-                    <h3>专利成果</h3>
-                    <p>拥有15项人工智能相关发明专利</p>
+                    <h3>无服务器网页部署</h3>
+                    <p>成功部署了一个无服务器网页，这是我在技术学习上的一个小小实践与成就。</p>
                 </div>
                  <!-- Add more achievement cards here if needed -->
             </div>
         </section>
-
-        <!-- Footer Section with Back Button -->
-        <footer class="page-footer">
-            <a href="index.html" class="back-button">返回首页</a>
-        </footer>
 
     </div> <!-- End of container -->
 </body>
