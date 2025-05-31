@@ -6,12 +6,12 @@
     <title>人物介绍 - alarm</title>
     <style>
         :root {
-            /* Changed to more vibrant colors */
-            --primary-color: #1abc9c; /* Turquoise */
-            --secondary-color: #f39c12; /* Orange */
-            --light-gray: #ecf0f1; /* Lighter gray for backgrounds */
-            --border-color: #bdc3c7; /* Slightly darker border */
-            --animation-duration: 0.6s; /* Animation speed */
+            /* Modified color scheme: Blue primary, light green secondary */
+            --primary-color: #3498db; /* A shade of blue */
+            --secondary-color: #a3e4d7; /* Light green */
+            --light-gray: #ecf0f1;
+            --border-color: #bdc3c7;
+            --animation-duration: 0.6s;
         }
 
         * {
@@ -23,9 +23,9 @@
 
         body {
             line-height: 1.6;
-            background-color: #e0e6e9; /* Slightly more vibrant body background */
-            padding: 2rem; /* Keep initial padding */
-            padding-top: 60px; /* Add padding to top to accommodate the fixed button */
+            background-color: #f0f8ff; /* Very light blue background */
+            padding: 2rem;
+            padding-top: 60px;
         }
 
         .container {
@@ -34,7 +34,7 @@
             background: white;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            overflow: hidden; /* Important for animations originating outside */
+            overflow: hidden;
         }
 
         /* --- Animations --- */
@@ -73,7 +73,7 @@
             display: flex;
             align-items: center;
             padding: 2rem;
-            /* Using vibrant colors for gradient */
+            /* Blue and light green gradient */
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
         }
@@ -105,10 +105,10 @@
         }
 
         .section h2 {
-            color: var(--primary-color); /* Using primary color for headings */
+            color: var(--primary-color); /* Blue for headings */
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--secondary-color); /* Using secondary for border */
+            border-bottom: 2px solid var(--secondary-color); /* Light green for border */
         }
 
         .achievements {
@@ -119,49 +119,49 @@
 
         .achievement-card {
             padding: 1.5rem;
-            background: var(--light-gray); /* Using lighter gray */
+            background: var(--light-gray);
             border-radius: 10px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .achievement-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.15); /* Slightly stronger shadow on hover */
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
         }
         .achievement-card h3 {
-             color: var(--primary-color); /* Using primary color for card headings */
+             color: var(--primary-color); /* Blue for card headings */
              margin-bottom: 0.5rem;
         }
 
         /* --- Fixed Back Button --- */
         .back-button {
-            position: fixed; /* Make it fixed */
-            top: 15px; /* Distance from top */
-            left: 15px; /* Distance from left */
-            z-index: 1000; /* Ensure it's above other content */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
 
             display: inline-block;
             padding: 0.8rem 1.5rem;
-            background-color: var(--secondary-color); /* Using secondary color */
+            background-color: var(--secondary-color); /* Light green */
             color: white;
             text-decoration: none;
             border-radius: 5px;
             font-size: 1rem;
             transition: background-color 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Add a subtle shadow */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .back-button:hover {
-            background-color: var(--primary-color); /* Using primary color on hover */
-            transform: scale(1.05); /* Slightly enlarge on hover */
+            background-color: var(--primary-color); /* Blue on hover */
+            transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
 
         @media (max-width: 768px) {
             body {
-                padding: 1rem; /* Reduce padding on smaller screens */
-                padding-top: 70px; /* Adjust top padding for smaller screens */
+                padding: 1rem;
+                padding-top: 70px;
             }
             .profile-header {
                 flex-direction: column;
@@ -170,14 +170,14 @@
 
             .avatar {
                 margin: 0 0 1rem 0;
-                width: 120px; /* Slightly smaller avatar */
+                width: 120px;
                 height: 120px;
             }
             .basic-info h1 {
-                font-size: 2rem; /* Adjust font size */
+                font-size: 2rem;
             }
              .section {
-                padding: 1.5rem; /* Reduce section padding */
+                padding: 1.5rem;
             }
 
              /* Adjust fixed button position on small screens if needed */
