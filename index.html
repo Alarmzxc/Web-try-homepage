@@ -230,44 +230,40 @@
 
 
     /* 响应式设计：当屏幕宽度小于900px时应用的样式 */
-    @media screen and (max-width: 768px) {
-      body {
-        grid-template-columns: 1fr; /* 网格变为单列 */
-        grid-template-rows: auto auto; /* 行高根据内容自动调整 */
-        gap: 30px; /* 网格项间距 */
-        height: auto; /* body高度根据内容调整，不再固定为100vh */
-        overflow-y: auto; /* 如果内容溢出，允许垂直滚动 */
-        padding: 20px; /* 减小内边距 */
-      }
+  @media screen and (max-width: 768px) {
+    body {
+      grid-template-columns: 1fr; /* 单列布局 */
+      grid-template-rows: auto auto auto; /* 三行布局 */
+      gap: 20px; /* 行间距 */
+      height: auto; /* 高度自适应 */
+      padding: 20px; /* 适当的内边距 */
+    }
 
-      /* 小屏幕下的左侧面板，高度自适应，减小内边边距 */
-      .left-panel {
-          height: auto;
-          padding: 20px;
-      }
+    /* 调整三个部分的顺序 */
+    .right-panel-top {
+      order: 1; /* 时间在最上面 */
+      border-radius: 20px; /* 保持圆角 */
+    }
 
-      /* 调整右侧面板新内部 div 的内边距 */
-      .right-panel-top,
-      .right-panel-bottom {
-          padding: 20px;
-      }
+    .left-panel {
+      order: 2; /* 个人介绍在中间 */
+      height: auto;
+      padding: 20px;
+      border-radius: 20px; /* 保持圆角 */
+    }
 
-      /* 小屏幕下调整顶部区域的圆角 */
-      .right-panel-top {
-         border-radius: 20px 20px 0 0; /* 保持顶部圆角 */
-      }
+    .right-panel-bottom {
+      order: 3; /* 跳转链接在最下面 */
+      background: rgba(255, 255, 255, 0.3); /* 添加背景使其可见 */
+      border-radius: 20px; /* 保持圆角 */
+      padding: 20px; /* 内边距 */
+    }
 
-       /* 小屏幕下调整底部区域的圆角 */
-       .right-panel-bottom {
-           border-radius: 0 0 20px 20px; /* 保持底部圆角 */
-       }
-
-
-      /* 将右侧面板（时间、按钮）置于左侧面板上方 (order: -1) */
-      .right-panel {
-        order: -1;
-        gap: 20px; /* 保持上下部分之间的间距 */
-      }
+    /* 移除原来的右侧面板排序 */
+    .right-panel {
+      order: unset;
+      display: contents; /* 让子元素直接成为网格项 */
+    }
 
       /* 减小时间字体大小 */
       .time {
