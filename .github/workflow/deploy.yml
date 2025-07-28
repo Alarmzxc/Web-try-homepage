@@ -1,0 +1,43 @@
+name: Deploy Public Content to Sealos OSS
+
+on:
+  push:
+    branches:
+      - main # 或者 master，根据你的主分支名称
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # 拉取你的 public 仓库内容
+
+      # --- 将仓库根目录内容上传到 Sealos OSS ---
+      - name: Deploy to Sealos OSS (S3 compatible)
+        env:
+          # 从 GitHub Secrets 获取凭证和 Endpoint
+          AWS_ACCESS_KEY_ID: ${{ secrets.SEALOS_OSS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SEALOS_OSS_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL: ${{ secrets.SEALOS_OSS_ENDPOINT }}
+          # OSS 存储桶的区域，如果 Sealos OSS 不区分区域，可以设置一个默认值或留空
+          AWS_REGION: us-east-1 # 例如，具体根据Sealos OSS配置
+
+        run: |
+          # 安装 aws-cli，用于与 S3 兼容的 OSS 进行交互
+          pip install awscli
+
+          # 使用 aws s3 sync 命令同步当前目录 (即仓库根目录) 到 OSS 存储桶
+          # ./: 表示当前目录（即 Git 仓库的根目录，也就是你的 public 内容）
+          # s3://your-oss-bucket-name/: 替换为你的 Sealos OSS 存储桶名称
+          # --endpoint-url: 指定 Sealos OSS 的 API endpoint
+          # --region: 指定区域 (如果 Sealos OSS 需要)
+          # --acl public-read: 设置上传的文件为公共读权限，确保网站可访问
+          # --delete: 谨慎使用！这会删除 OSS 存储桶中，在你的 Git 仓库中不存在的任何文件。
+          #           如果你的存储桶只存放这个博客，且不希望有旧文件残留，可以使用。
+          #           如果存储桶还存放其他文件，请勿使用此选项。
+          aws s3 sync ./. s3://your-oss-bucket-name/ \
+            --endpoint-url $AWS_ENDPOINT_URL \
+            --region $AWS_REGION \
+            --acl public-read \
+            --delete # 谨慎使用此选项
