@@ -1,4 +1,4 @@
-name: Deploy Public Content to Sealos OSS
+name: Deploy Public Content to Sealos OSS with MinIO Client
 
 on:
   push:
@@ -13,31 +13,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4 # 拉取你的 public 仓库内容
 
-      # --- 将仓库根目录内容上传到 Sealos OSS ---
-      - name: Deploy to Sealos OSS (S3 compatible)
-        env:
-          # 从 GitHub Secrets 获取凭证和 Endpoint
-          AWS_ACCESS_KEY_ID: ${{ secrets.SEALOS_OSS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SEALOS_OSS_SECRET_ACCESS_KEY }}
-          AWS_ENDPOINT_URL: ${{ secrets.SEALOS_OSS_ENDPOINT }}
-          # OSS 存储桶的区域，如果 Sealos OSS 不区分区域，可以设置一个默认值或留空
-          AWS_REGION: us-east-1 # 例如，具体根据Sealos OSS配置
-
+      - name: Set up MinIO Client (mc)
         run: |
-          # 安装 aws-cli，用于与 S3 兼容的 OSS 进行交互
-          pip install awscli
+          # 下载并安装 mc
+          wget https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x mc
+          sudo mv mc /usr/local/bin/
 
-          # 使用 aws s3 sync 命令同步当前目录 (即仓库根目录) 到 OSS 存储桶
-          # ./: 表示当前目录（即 Git 仓库的根目录，也就是你的 public 内容）
-          # s3://your-oss-bucket-name/: 替换为你的 Sealos OSS 存储桶名称
-          # --endpoint-url: 指定 Sealos OSS 的 API endpoint
-          # --region: 指定区域 (如果 Sealos OSS 需要)
-          # --acl public-read: 设置上传的文件为公共读权限，确保网站可访问
-          # --delete: 谨慎使用！这会删除 OSS 存储桶中，在你的 Git 仓库中不存在的任何文件。
-          #           如果你的存储桶只存放这个博客，且不希望有旧文件残留，可以使用。
-          #           如果存储桶还存放其他文件，请勿使用此选项。
-          aws s3 sync ./. s3://your-oss-bucket-name/ \
-            --endpoint-url $AWS_ENDPOINT_URL \
-            --region $AWS_REGION \
-            --acl public-read \
-            --delete # 谨慎使用此选项
+      - name: Configure MinIO Client alias for Sealos OSS
+        env:
+          # 使用你的 GitHub Secrets
+          MC_HOSTNAME: ${{ secrets.SEALOS_OSS_ENDPOINT }} # 你的外部 Endpoint，例如 objectstorageapi.gzg.sealos.run
+          MC_ACCESS_KEY: ${{ secrets.SEALOS_OSS_ACCESS_KEY_ID }}
+          MC_SECRET_KEY: ${{ secrets.SEALOS_OSS_SECRET_ACCESS_KEY }}
+        run: |
+          # 为 Sealos OSS 添加一个 mc alias
+          # 'sealososs' 是你给这个连接起的名字
+          # 注意这里的 endpoint 需要加上 'https://'
+          mc alias set sealososs https://${{ env.MC_HOSTNAME }} "${{ env.MC_ACCESS_KEY }}" "${{ env.MC_SECRET_KEY }}" --api S3v4
+
+      - name: Deploy public content to Sealos OSS bucket
+        run: |
+          # 使用 mc mirror 命令同步本地仓库根目录 (./) 到 OSS 存储桶
+          # sealososs/aar2acjy-home-page: target path on OSS
+          # --overwrite: 覆盖已存在的同名文件
+          # --remove: 删除 OSS 目标路径下，源路径中不存在的文件 (谨慎使用，就像 aws s3 sync 的 --delete)
+          # --skip-existing: 跳过已经存在且文件大小相同的文件
+          # --json: 输出 JSON 格式的日志
+          # --recursive: 递归同步目录
+          # --exclude "*" --include "*.html" --include "*.css" ... : 可以用作更细致的过滤（如果需要）
+          mc mirror --overwrite --remove --json --recursive ./. sealososs/aar2acjy-home-page/
+
+          # 如果你不想删除OSS上多余的文件，只进行增量更新和上传新文件，可以使用：
+          # mc cp --recursive ./. sealososs/aar2acjy-home-page/
