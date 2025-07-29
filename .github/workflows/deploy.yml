@@ -22,27 +22,21 @@ jobs:
 
       - name: Configure MinIO Client alias for Sealos OSS
         env:
-          # 使用你的 GitHub Secrets
           MC_HOSTNAME: ${{ secrets.SEALOS_OSS_ENDPOINT }} # 你的外部 Endpoint，例如 objectstorageapi.gzg.sealos.run
           MC_ACCESS_KEY: ${{ secrets.SEALOS_OSS_ACCESS_KEY_ID }}
           MC_SECRET_KEY: ${{ secrets.SEALOS_OSS_SECRET_ACCESS_KEY }}
         run: |
-          # 为 Sealos OSS 添加一个 mc alias
-          # 'sealososs' 是你给这个连接起的名字
-          # 注意这里的 endpoint 需要加上 'https://'
           mc alias set sealososs https://${{ env.MC_HOSTNAME }} "${{ env.MC_ACCESS_KEY }}" "${{ env.MC_SECRET_KEY }}" --api S3v4
 
       - name: Deploy public content to Sealos OSS bucket
         run: |
           # 使用 mc mirror 命令同步本地仓库根目录 (./) 到 OSS 存储桶
-          # sealososs/aar2acjy-home-page: target path on OSS
-          # --overwrite: 覆盖已存在的同名文件
-          # --remove: 删除 OSS 目标路径下，源路径中不存在的文件 (谨慎使用，就像 aws s3 sync 的 --delete)
-          # --skip-existing: 跳过已经存在且文件大小相同的文件
-          # --json: 输出 JSON 格式的日志
-          # --recursive: 递归同步目录
-          # --exclude "*" --include "*.html" --include "*.css" ... : 可以用作更细致的过滤（如果需要）
-          mc mirror --overwrite --remove --json --recursive ./. sealososs/aar2acjy-home-page/
+          # 移除了 --recursive 标志，因为 mc mirror 默认就是递归的
+          mc mirror --overwrite --remove --json ./. sealososs/your-oss-bucket-name/
 
           # 如果你不想删除OSS上多余的文件，只进行增量更新和上传新文件，可以使用：
-          # mc cp --recursive ./. sealososs/aar2acjy-home-page/
+          # mc cp --recursive ./. sealososs/your-oss-bucket-name/ # 注意：mc cp 也通常不需要 --recursive
+                                                                # mc cp 后面如果跟目录，它通常也是递归的
+                                                                # 更安全的做法是：
+                                                                # mc cp --attr 'Content-Type=' --attr 'x-amz-acl=public-read' --attr 'Cache-Control=max-age=3600' --disable-multipart --no-http-monitor --no-check-alias --no-progress --recursive --preserve ./. sealososs/your-oss-bucket-name/
+                                                                # 但对于静态网站，mc mirror 配合 --overwrite 是比较合适的
