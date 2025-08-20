@@ -25,7 +25,16 @@
   {
     "category": "风景",
     "photos": [
-      { "url": "https://programnotes.cn/Image/logo.png", "caption": "123" }
+      { "url": "https://image.alarmandcxz.dpdns.org/file/AgACAgUAAyEGAASZwsIlAAMHaKWOPgxIQE-XawHMix8PHuoJL8gAAmLGMRsesTFVMEm9J_ueSm0BAAMCAAN3AAM2BA.png", "caption": "夜色" }
+    ]
+  },
+    {
+    "category": "动漫",
+    "photos": [
+      { "url": "https://image.alarmandcxz.dpdns.org/file/AgACAgUAAyEGAASZwsIlAAMIaKWO3_gshqW6sMe2Ub1X1Uv4JJgAAmPGMRsesTFVRJ06T7nP5-oBAAMCAAN5AAM2BA.jpg", "caption": "窗边夜景" },
+      { "url": "https://image.alarmandcxz.dpdns.org/file/AgACAgUAAyEGAASZwsIlAAMJaKWPMwKzuBgnE2WVD7jx3m7REF4AAmXGMRsesTFVnb_hpgZXYnwBAAMCAAN3AAM2BA.jpg", "caption": "智子" },
+      { "url": "https://image.alarmandcxz.dpdns.org/file/AgACAgUAAyEGAASZwsIlAAMKaKWPNCIBQej82BZMl1F_Nwy_zy8AAmbGMRsesTFV3Sg1MiF3TfYBAAMCAAN3AAM2BA.jpg", "caption": "鬼灭之刃 弥豆子" },
+      { "url": "https://image.alarmandcxz.dpdns.org/file/AgACAgUAAyEGAASZwsIlAAMLaKWPNQU0aCMH2AQGJfvgW33PNbYAAmfGMRsesTFVPqLXL9k4MpsBAAMCAAN3AAM2BA.jpg", "caption": "鬼灭之刃 蝴蝶" }
     ]
   }
 ]
