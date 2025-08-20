@@ -1,0 +1,31 @@
+[
+  {
+    "category": "新版樱花",
+    "photos": [
+      { "url": "https://i.imgs.ovh/2025/04/29/r7Aka.png", "caption": "随景" },
+      { "url": "https://i.imgs.ovh/2025/04/29/r7zOe.png", "caption": "告示牌1" },
+      { "url": "https://i.imgs.ovh/2025/04/29/r7VKh.png", "caption": "告示牌2" },
+      { "url": "https://i.imgs.ovh/2025/04/29/r7TrM.png", "caption": "小径1" },
+      { "url": "https://i.imgs.ovh/2025/05/29/Txuqe.png", "caption": "小径2" }
+    ]
+  },
+  {
+    "category": "雨水",
+    "photos": [
+      { "url": "https://i.imgs.ovh/2025/04/29/r7Sux.png", "caption": "垂钓" }
+    ]
+  },
+  {
+    "category": "第一人称",
+    "photos": [
+      { "url": "https://i.imgs.ovh/2025/05/29/TxhIr.png", "caption": "1" },
+      { "url": "https://i.imgs.ovh/2025/05/29/TxI9M.png", "caption": "2" }
+    ]
+  },
+  {
+    "category": "风景",
+    "photos": [
+      { "url": "https://programnotes.cn/Image/logo.png", "caption": "123" }
+    ]
+  }
+]
