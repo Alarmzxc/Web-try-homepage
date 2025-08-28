@@ -2,26 +2,26 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <!-- 添加这行关键的viewport元标签 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ALARMZXC的网页</title>
   <link rel="icon" href="./image/favicon.ico">
-  <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-L9VP1EQP6G"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-L9VP1EQP6G');
-</script>
-  <!-- 谷歌广告代码 -->
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L9VP1EQP6G"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L9VP1EQP6G');
+  </script>
+  
+  <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3951887033933056"
      crossorigin="anonymous"></script>
 
   <style>
-    /* CSS 样式区域 */
+    /* ===== 基础样式 ===== */
     * {
       margin: 0;
       padding: 0;
@@ -30,6 +30,7 @@
     }
 
     body {
+      cursor: url('./image/normal.cur'), auto;
       background: url('./image/background.webp') no-repeat center center fixed;
       background-size: cover;
       height: 100vh;
@@ -42,13 +43,14 @@
     }
 
     .panel {
-       border-radius: 20px;
-       height: 100%;
-       box-sizing: border-box;
-       display: flex;
-       flex-direction: column;
+      border-radius: 20px;
+      height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
 
+    /* ===== 左侧面板样式 ===== */
     .left-panel {
       background: rgba(255, 255, 255, 0.3);
       align-items: center;
@@ -74,6 +76,7 @@
       font-size: 1.2em;
     }
 
+    /* ===== 右侧面板样式 ===== */
     .right-panel {
       display: flex;
       flex-direction: column;
@@ -82,28 +85,29 @@
     }
 
     .right-panel-top {
-        background: rgba(25, 25, 25, 0.5);
-        border-radius: 20px 20px 20px 20px;
-        padding: 30px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        gap: 20px;
-        flex-shrink: 0;
-        height: auto;
+      background: rgba(25, 25, 25, 0.5);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 20px;
+      flex-shrink: 0;
+      height: auto;
     }
 
     .right-panel-bottom {
-        background: transparent;
-        border-radius: 0 0 20px 20px;
-        padding: 30px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+      background: transparent;
+      border-radius: 0 0 20px 20px;
+      padding: 30px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
+    /* ===== 时间显示样式 ===== */
     .time {
       display: flex;
       justify-content: center;
@@ -119,18 +123,17 @@
     }
 
     .period {
-        font-size: 1.5rem;
-        text-align: left;
+      font-size: 1.5rem;
+      text-align: left;
     }
 
     .seconds {
-        font-size: 1.5rem;
-        text-align: left;
-        font-weight: bold;
+      font-size: 1.5rem;
+      text-align: left;
+      font-weight: bold;
     }
 
-    .hours,
-    .minutes {
+    .hours, .minutes {
       font-weight: bold;
     }
 
@@ -139,6 +142,7 @@
       color: #bbb;
     }
 
+    /* ===== 日历样式 ===== */
     .calender {
       font-size: 1.3em;
       margin-top: 15px;
@@ -148,23 +152,25 @@
       text-align: center;
     }
 
+    /* ===== 按钮样式 ===== */
     .buttons-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-        justify-content: center;
-        width: 100%;
-        max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      justify-content: center;
+      width: 100%;
+      max-width: 600px;
     }
 
     .action-button {
       background-color: rgba(255, 255, 255, 0.5);
       padding: 24px 20px;
+      flex-direction: column;
       width: 150px;
       margin-left: auto;
       margin-right: auto;
       height: 180px;
-      border-radius: 12px;
+      border-radius: 6px;
       font-size: 1.3em;
       font-weight: bold;
       text-align: center;
@@ -189,7 +195,11 @@
     .blog-hexo { color: #F5F5DC; }
     .achat-button { color: #2F3ED7; }
 
-    /* 响应式设计：修复移动端显示 */
+    a, .action-button {
+      cursor: url('./image/hover.ani'), pointer;
+    }
+
+    /* ===== 响应式设计 ===== */
     @media screen and (max-width: 768px) {
       body {
         grid-template-columns: 1fr;
@@ -197,7 +207,6 @@
         gap: 15px;
         height: auto;
         padding: 15px;
-        /* 确保在小屏幕上不会出现水平滚动 */
         overflow-x: hidden;
       }
 
@@ -227,50 +236,48 @@
       }
 
       .time {
-          font-size: 2.5em; /* 进一步减小字体 */
+        font-size: 2.5em;
       }
 
-      .period,
-      .seconds {
-          font-size: 1.2rem; /* 稍微减小字体 */
+      .period, .seconds {
+        font-size: 1.2rem;
       }
 
       .left-panel img {
-          width: 100px; /* 进一步减小头像 */
-          height: 100px;
-          margin: 10px 0;
+        width: 100px;
+        height: 100px;
+        margin: 10px 0;
       }
 
-       .left-panel h1 {
-          font-size: 1.3em;
-       }
+      .left-panel h1 {
+        font-size: 1.3em;
+      }
 
-       .left-panel p {
-          font-size: 0.9em;
-       }
+      .left-panel p {
+        font-size: 0.9em;
+      }
 
-       .buttons-container {
-           gap: 10px;
-           max-width: none;
-           /* 在小屏幕上使用更合适的列数 */
-           grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-       }
+      .buttons-container {
+        gap: 10px;
+        max-width: none;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
 
-       .action-button {
-           font-size: 0.9em;
-           padding: 8px 12px;
-           height: 120px; /* 减小按钮高度 */
-           width: 100px;   /* 减小按钮宽度 */
-           min-width: 90px; /* 设置最小宽度防止过小 */
-       }
+      .action-button {
+        font-size: 0.9em;
+        padding: 8px 12px;
+        height: 120px;
+        width: 100px;
+        min-width: 90px;
+      }
 
-       .calender {
-         font-size: 1.1em;
-         margin-top: 10px;
-       }
+      .calender {
+        font-size: 1.1em;
+        margin-top: 10px;
+      }
     }
 
-    /* 针对更小屏幕的额外优化 */
+    /* 超小屏幕优化 */
     @media screen and (max-width: 480px) {
       body {
         padding: 10px;
@@ -307,51 +314,57 @@
   <div class="panel right-panel">
     <!-- 右侧面板上部分：时间、日历 -->
     <div class="right-panel-top">
-        <!-- 当前时间显示区域 -->
-        <div class="time">
-          <span class="hours">00</span><span class="dots">:</span><span class="minutes">00</span>
-          <div class="right-side">
-            <span class="period">AM</span>
-            <span class="seconds">00</span>
-          </div>
+      <!-- 当前时间显示区域 -->
+      <div class="time">
+        <span class="hours">00</span><span class="dots">:</span><span class="minutes">00</span>
+        <div class="right-side">
+          <span class="period">AM</span>
+          <span class="seconds">00</span>
         </div>
+      </div>
 
-        <!-- 日历显示区域 -->
-        <div class="calender">
-          <span class="month-name">月</span>
-          <span class="day-num">00</span>日，
-          <span class="day-name">星期</span>
-        </div>
+      <!-- 日历显示区域 -->
+      <div class="calender">
+        <span class="month-name">月</span>
+        <span class="day-num">00</span>日，
+        <span class="day-name">星期</span>
+      </div>
     </div>
 
     <!-- 右侧面板下部分：按钮 -->
     <div class="right-panel-bottom">
-        <!-- 按钮容器 -->
-        <div class="buttons-container">
-            <a href="runoob-test.html" class="action-button time-button">
-                 具体时间
-            </a>
-            <a href="deepseek_html and gemini.html" class="action-button intro-button">
-                 简介
-            </a>
-            <a href="photos.html" class="action-button photos-button">
-                 照片集
-            </a>
-            <a href="https://hexo.alarmandcxz.dpdns.org" class="action-button blog-hexo">
-                 参观博客
-            </a>
-            <a href="https://newsnow.alarmandcxz.dpdns.org" class="action-button news-button">
-                 今日热点
-            </a>
-            <a href="https://achat.alarmandcxz.dpdns.org/auth" class="action-button achat-button">
-                 聊天室
-            </a>
-        </div>
+      <!-- 按钮容器 -->
+      <div class="buttons-container">
+        <a href="runoob-test.html" class="action-button time-button">
+          <i class="fas fa-clock"></i>
+          具体时间
+        </a>
+        <a href="deepseek_html and gemini.html" class="action-button intro-button">
+          <i class="fas fa-user"></i>
+          简介
+        </a>
+        <a href="photos.html" class="action-button photos-button">
+          <i class="fas fa-images"></i>
+          照片集
+        </a>
+        <a href="https://hexo.alarmandcxz.dpdns.org" class="action-button blog-hexo">
+          <i class="fas fa-blog"></i>
+          参观博客
+        </a>
+        <a href="https://newsnow.alarmandcxz.dpdns.org" class="action-button news-button">
+          <i class="fas fa-newspaper"></i>
+          今日热点
+        </a>
+        <a href="https://achat.alarmandcxz.dpdns.org/auth" class="action-button achat-button">
+          <i class="fas fa-comments"></i>
+          聊天室
+        </a>
+      </div>
     </div>
   </div>
 
   <script>
-    // JavaScript 时钟和日历逻辑
+    // 更新时钟函数
     function updateClock() {
       const now = new Date();
       let h = now.getHours();
@@ -359,18 +372,22 @@
       let s = now.getSeconds();
       let period = h >= 12 ? 'PM' : 'AM';
 
+      // 转换为12小时制
       if (h > 12) h = h % 12;
       if (h === 0) h = 12;
 
+      // 格式化时间
       h = h < 10 ? "0" + h : h;
       m = m < 10 ? "0" + m : m;
       s = s < 10 ? "0" + s : s;
 
+      // 更新时间显示
       document.querySelector(".hours").innerHTML = h;
       document.querySelector(".minutes").innerHTML = m;
       document.querySelector(".seconds").innerHTML = s;
       document.querySelector(".period").innerHTML = period;
 
+      // 更新日期显示
       const day = now.toLocaleString("zh-CN", { weekday: "long" });
       const month = now.toLocaleString("zh-CN", { month: "short" });
       const date = now.getDate();
@@ -380,8 +397,9 @@
       document.querySelector(".day-num").innerHTML = date;
     }
 
+    // 每秒更新一次时间
     setInterval(updateClock, 1000);
-    updateClock();
+    updateClock(); // 初始化显示
   </script>
 </body>
 </html>
