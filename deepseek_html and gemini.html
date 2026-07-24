@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人物介绍 - alarm</title>
+    <style>
+        :root {
+            /* Modified color scheme: Blue primary, light green secondary */
+            --primary-color: #3498db; /* A shade of blue */
+            --secondary-color: #a3e4d7; /* Light green */
+            --light-gray: #ecf0f1;
+            --border-color: #bdc3c7;
+            --animation-duration: 0.6s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', '微软雅黑', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background-color: #f0f8ff; /* Very light blue background */
+            padding: 2rem;
+            padding-top: 60px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Apply animation to elements */
+        .profile-header .avatar,
+        .profile-header .basic-info,
+        .section,
+        .achievement-card {
+            animation: fadeInUp var(--animation-duration) ease-out forwards;
+            opacity: 0; /* Start hidden before animation */
+        }
+
+        /* Stagger animations */
+        .profile-header .avatar { animation-delay: 0.1s; }
+        .profile-header .basic-info { animation-delay: 0.2s; }
+        .section:nth-of-type(1) { animation-delay: 0.3s; } /* Introduction */
+        .section:nth-of-type(2) { animation-delay: 0.4s; } /* Gaming History */
+        .section:nth-of-type(3) { animation-delay: 0.5s; } /* Technical/Achievements */
+
+        /* Stagger achievement cards if needed */
+        .achievements .achievement-card:nth-child(1) { animation-delay: 0.6s; }
+
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            padding: 2rem;
+            /* Blue and light green gradient */
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin-right: 2rem;
+            object-fit: cover; /* Ensure image covers the circular area */
+        }
+
+        .basic-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .basic-info p {
+            font-size: 1.1rem;
+        }
+
+        .section {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            color: var(--primary-color); /* Blue for headings */
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary-color); /* Light green for border */
+        }
+
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .achievement-card {
+            padding: 1.5rem;
+            background: var(--light-gray);
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        .achievement-card h3 {
+             color: var(--primary-color); /* Blue for card headings */
+             margin-bottom: 0.5rem;
+        }
+
+        /* --- Fixed Back Button --- */
+        .back-button {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--secondary-color); /* Light green */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .back-button:hover {
+            background-color: var(--primary-color); /* Blue on hover */
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+                padding-top: 70px;
+            }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .avatar {
+                margin: 0 0 1rem 0;
+                width: 120px;
+                height: 120px;
+            }
+            .basic-info h1 {
+                font-size: 2rem;
+            }
+             .section {
+                padding: 1.5rem;
+            }
+
+             /* Adjust fixed button position on small screens if needed */
+             .back-button {
+                 top: 10px;
+                 left: 10px;
+                 padding: 0.6rem 1.2rem; /* Slightly smaller button */
+             }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Back Button - placed outside the container for fixed positioning relative to viewport -->
+    <a href="index.html" class="back-button">返回首页</a>
+
+    <div class="container">
+        <header class="profile-header">
+            <!-- Avatar -->
+            <img src="./image/avatar.webp" alt="alarm" class="avatar">
+            <div class="basic-info">
+                <h1>alarm</h1>
+                <p>一名普通的大学生</p>
+            </div>
+        </header>
+
+        <section class="section">
+            <h2>简介</h2>
+            <p>你好，我是alarm，一名正在大学里努力学习的普通学生。我对电脑世界充满了好奇，平时的爱好是各种电脑游戏。除此之外，我也对技术学习保持着一份热情，喜欢探索一些有趣的技术领域。</p>
+        </section>
+
+        <section class="section">
+            <h2>游戏经历</h2>
+            <p>我的游戏经历或许算不上辉煌，但绝对称得上历史悠久。我是一名《生死狙击》十年老玩家，这款游戏陪伴了我很长时间。同时，我也是《Minecraft》的多年玩家，尤其喜欢在其中进行休闲生存，享受创造和探索的乐趣。</p>
+        </section>
+
+        <section class="section">
+            <h2>技术与成就</h2>
+            <div class="achievements">
+                <div class="achievement-card">
+                    <h3>无服务器网页部署</h3>
+                    <p>成功部署了一个无服务器网页，这是我在技术学习上的一个小小实践与成就。</p>
+                </div>
+                 <!-- Add more achievement cards here if needed -->
+            </div>
+        </section>
+
+    </div> <!-- End of container -->
+</body>
+</html>

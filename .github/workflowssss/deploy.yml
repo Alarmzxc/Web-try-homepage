@@ -1,0 +1,42 @@
+name: Deploy Public Content to Sealos OSS with MinIO Client
+
+on:
+  push:
+    branches:
+      - main # 或者 master，根据你的主分支名称
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # 拉取你的 public 仓库内容
+
+      - name: Set up MinIO Client (mc)
+        run: |
+          # 下载并安装 mc
+          wget https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x mc
+          sudo mv mc /usr/local/bin/
+
+      - name: Configure MinIO Client alias for Sealos OSS
+        env:
+          MC_HOSTNAME: ${{ secrets.SEALOS_OSS_ENDPOINT }} # 你的外部 Endpoint，例如 objectstorageapi.gzg.sealos.run
+          MC_ACCESS_KEY: ${{ secrets.SEALOS_OSS_ACCESS_KEY_ID }}
+          MC_SECRET_KEY: ${{ secrets.SEALOS_OSS_SECRET_ACCESS_KEY }}
+        run: |
+          mc alias set sealososs https://${{ env.MC_HOSTNAME }} "${{ env.MC_ACCESS_KEY }}" "${{ env.MC_SECRET_KEY }}" --api S3v4
+
+      - name: Deploy public content to Sealos OSS bucket
+        run: |
+          # 使用 mc mirror 命令同步本地仓库根目录 (./) 到 OSS 存储桶
+          # 移除了 --recursive 标志，因为 mc mirror 默认就是递归的
+          mc mirror --overwrite --remove --json ./. sealososs/your-oss-bucket-name/
+
+          # 如果你不想删除OSS上多余的文件，只进行增量更新和上传新文件，可以使用：
+          # mc cp --recursive ./. sealososs/your-oss-bucket-name/ # 注意：mc cp 也通常不需要 --recursive
+                                                                # mc cp 后面如果跟目录，它通常也是递归的
+                                                                # 更安全的做法是：
+                                                                # mc cp --attr 'Content-Type=' --attr 'x-amz-acl=public-read' --attr 'Cache-Control=max-age=3600' --disable-multipart --no-http-monitor --no-check-alias --no-progress --recursive --preserve ./. sealososs/your-oss-bucket-name/
+                                                                # 但对于静态网站，mc mirror 配合 --overwrite 是比较合适的

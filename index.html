@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALARMZXC的网页</title>
+  <link rel="icon" href="./image/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L9VP1EQP6G"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L9VP1EQP6G');
+  </script>
+  
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3951887033933056"
+     crossorigin="anonymous"></script>
+
+  <style>
+    /* ===== 基础样式 ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      cursor: url('image/sword-big.png'), auto;
+      background: url('./image/background.webp') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-template-rows: 1fr;
+      gap: 24px;
+      padding: 32px;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      isolation: isolate;
+    }
+
+    /* 背景柔化蒙层 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.06);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== 通用面板 ===== */
+    .panel {
+      border-radius: 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== 左侧面板 — 毛玻璃卡片 ===== */
+    .left-panel {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px) saturate(1.1);
+      -webkit-backdrop-filter: blur(10px) saturate(1.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 28px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: opacity 0.35s ease;
+    }
+
+    .left-panel.clock-fading {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .left-panel img {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      margin: 24px 0;
+      box-shadow:
+        0 3px 18px rgba(0, 0, 0, 0.15),
+        0 0 0 3px rgba(255, 255, 255, 0.06);
+      transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+    }
+
+    .left-panel img:hover {
+      transform: scale(1.06);
+    }
+
+    .left-panel h1 {
+      font-size: 1.75em;
+      font-weight: 700;
+      background: linear-gradient(135deg, rgba(224, 231, 255, 0.85) 0%, rgba(125, 211, 252, 0.85) 50%, rgba(196, 181, 253, 0.85) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+      letter-spacing: 0.04em;
+    }
+
+    .left-panel p {
+      font-size: 1.1em;
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 400;
+    }
+
+    /* ===== 右侧面板 ===== */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 0;
+      border-radius: 0;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: none;
+    }
+
+    /* ===== 右侧上：时间 & 日历 — 深色毛玻璃 ===== */
+    .right-panel-top {
+      background: rgba(10, 10, 20, 0.28);
+      backdrop-filter: blur(10px) saturate(1.1);
+      -webkit-backdrop-filter: blur(10px) saturate(1.1);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 38px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      transition: opacity 0.35s ease;
+    }
+
+    .right-panel-top.clock-fading {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ===== 右侧下：按钮区 ===== */
+    .right-panel-bottom {
+      background: transparent;
+      border-radius: 20px;
+      padding: 16px 6px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ===== 时间数字 ===== */
+    .time {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 4.5em;
+      gap: 6px;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.18);
+    }
+
+    .hours, .minutes {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .dots {
+      font-size: 1.1em;
+      color: rgba(255, 255, 255, 0.35);
+      animation: dotsPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes dotsPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.65; }
+    }
+
+    .right-side {
+      display: flex;
+      flex-direction: column;
+      margin-left: 8px;
+    }
+
+    .period {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: left;
+      letter-spacing: 0.06em;
+    }
+
+    .seconds {
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-align: left;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ===== 日历 ===== */
+    .calender {
+      font-size: 1.1em;
+      margin-top: 2px;
+      background: linear-gradient(135deg, rgba(192, 132, 252, 0.8), rgba(244, 114, 182, 0.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    /* ===== 按钮网格 ===== */
+    .buttons-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      max-width: 620px;
+      transition: opacity 0.35s ease;
+    }
+
+    .buttons-container.clock-fading {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ===== 按钮 — 轻盈毛玻璃 ===== */
+    .action-button {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(5px) saturate(1.05);
+      -webkit-backdrop-filter: blur(5px) saturate(1.05);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 26px 14px 20px;
+      border-radius: 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      text-align: center;
+      cursor: url('image/xbow-big.png'), pointer;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.15);
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 顶部光泽 */
+    .action-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      border-radius: 16px 16px 0 0;
+      pointer-events: none;
+    }
+
+    .action-button i {
+      font-size: 1.9em;
+      transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.15);
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.15));
+    }
+
+    .action-button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .action-button:hover i {
+      transform: scale(1.15);
+    }
+
+    .action-button:active {
+      transform: translateY(-1px) scale(0.98);
+      transition: all 0.1s ease;
+    }
+
+    /* ===== 各按钮颜色主题 ===== */
+    .time-button { color: rgba(196, 181, 253, 0.9); }
+    .time-button:hover {
+      color: #ddd6fe;
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(196, 181, 253, 0.28);
+      box-shadow: 0 10px 28px rgba(139, 92, 246, 0.12), 0 0 0 1px rgba(196, 181, 253, 0.18);
+    }
+
+    .intro-button { color: rgba(147, 197, 253, 0.9); }
+    .intro-button:hover {
+      color: #bfdbfe;
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(147, 197, 253, 0.28);
+      box-shadow: 0 10px 28px rgba(59, 130, 246, 0.12), 0 0 0 1px rgba(147, 197, 253, 0.18);
+    }
+
+    .photos-button { color: rgba(103, 232, 249, 0.9); }
+    .photos-button:hover {
+      color: #a5f3fc;
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(103, 232, 249, 0.28);
+      box-shadow: 0 10px 28px rgba(6, 182, 212, 0.12), 0 0 0 1px rgba(103, 232, 249, 0.18);
+    }
+
+    .news-button { color: rgba(252, 165, 165, 0.9); }
+    .news-button:hover {
+      color: #fecaca;
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(252, 165, 165, 0.28);
+      box-shadow: 0 10px 28px rgba(239, 68, 68, 0.12), 0 0 0 1px rgba(252, 165, 165, 0.18);
+    }
+
+    .blog-hexo { color: rgba(254, 215, 170, 0.9); }
+    .blog-hexo:hover {
+      color: #ffedd5;
+      background: rgba(249, 115, 22, 0.15);
+      border-color: rgba(254, 215, 170, 0.28);
+      box-shadow: 0 10px 28px rgba(249, 115, 22, 0.12), 0 0 0 1px rgba(254, 215, 170, 0.18);
+    }
+
+    .achat-button { color: rgba(165, 180, 252, 0.9); }
+    .achat-button:hover {
+      color: #c7d2fe;
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(165, 180, 252, 0.28);
+      box-shadow: 0 10px 28px rgba(99, 102, 241, 0.12), 0 0 0 1px rgba(165, 180, 252, 0.18);
+    }
+
+    a, button, .clock-overlay-close, .clock-dot-menu-btn, .clock-format-switch {
+      cursor: url('image/xbow-big.png'), pointer;
+    }
+
+    /* ===== 响应式 — 平板 / 手机 (≤768px) ===== */
+    @media screen and (max-width: 768px) {
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        gap: 16px;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 16px;
+      }
+
+      .right-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .right-panel-top {
+        order: 1;
+        border-radius: 18px;
+        padding: 26px 20px;
+        gap: 10px;
+      }
+
+      .left-panel {
+        order: 2;
+        height: auto;
+        padding: 28px 18px;
+        border-radius: 18px;
+      }
+
+      .right-panel-bottom {
+        order: 3;
+        padding: 4px 0;
+      }
+
+      .time {
+        font-size: 3.2em;
+      }
+
+      .period { font-size: 1.05rem; }
+      .seconds { font-size: 1.15rem; }
+
+      .left-panel img {
+        width: 100px;
+        height: 100px;
+        margin: 12px 0;
+      }
+
+      .left-panel h1 { font-size: 1.35em; }
+      .left-panel p { font-size: 0.9em; }
+
+      .buttons-container {
+        gap: 12px;
+        max-width: none;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .action-button {
+        font-size: 0.82em;
+        padding: 20px 8px 16px;
+        border-radius: 14px;
+        gap: 9px;
+      }
+
+      .action-button i { font-size: 1.55em; }
+      .calender { font-size: 1em; }
+    }
+
+    /* ===== 响应式 — 小手机 (≤400px) ===== */
+    @media screen and (max-width: 400px) {
+      body {
+        padding: 10px;
+        gap: 12px;
+      }
+
+      .time { font-size: 2.5em; }
+
+      .period { font-size: 0.9rem; }
+      .seconds { font-size: 1rem; }
+
+      .right-panel-top {
+        padding: 20px 14px;
+        border-radius: 16px;
+      }
+
+      .left-panel {
+        padding: 22px 12px;
+        border-radius: 16px;
+      }
+
+      .left-panel img {
+        width: 80px;
+        height: 80px;
+      }
+
+      .left-panel h1 { font-size: 1.2em; }
+      .left-panel p { font-size: 0.82em; }
+
+      .buttons-container {
+        gap: 8px;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .action-button {
+        font-size: 0.74em;
+        padding: 16px 4px 12px;
+        border-radius: 12px;
+        gap: 7px;
+      }
+
+      .action-button i { font-size: 1.3em; }
+
+      .calender { font-size: 0.9em; }
+    }
+
+    /* ===== 时钟全屏叠加层 ===== */
+    .clock-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .clock-overlay.open {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .clock-overlay-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(20px) saturate(0.85);
+      -webkit-backdrop-filter: blur(20px) saturate(0.85);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .clock-overlay.open .clock-overlay-bg {
+      opacity: 1;
+    }
+
+    /* 时钟卡片 */
+    .clock-overlay-panel {
+      position: relative;
+      z-index: 1;
+      background: rgba(20, 20, 35, 0.4);
+      backdrop-filter: blur(18px) saturate(1.3);
+      -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      padding: 48px 56px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transition: opacity 0.55s ease 0.35s;
+    }
+
+    .clock-overlay.open .clock-overlay-panel {
+      opacity: 1;
+    }
+
+    /* 发光边框光晕 */
+    .clock-overlay-panel::before {
+      content: '';
+      position: absolute;
+      background: linear-gradient(45deg, #24ff6d, #2f93f1, #ff5e9a, #c084fc);
+      background-size: 300% 300%;
+      top: -3px; left: -3px; bottom: -3px; right: -3px;
+      z-index: -1;
+      border-radius: 30px;
+      filter: blur(22px);
+      opacity: 0.22;
+      animation: clockGlow 8s ease infinite;
+    }
+
+    @keyframes clockGlow {
+      0%   { background-position: 0 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0 50%; }
+    }
+
+    /* 大时间数字 */
+    .clock-overlay-time {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay-hours, .overlay-dots, .overlay-minutes {
+      font-weight: 700;
+      padding: 0 clamp(6px, 2vw, 12px);
+    }
+
+    .overlay-hours, .overlay-minutes {
+      font-size: clamp(3.5em, 9vw, 7.5em);
+    }
+
+    .overlay-dots {
+      font-size: clamp(2.2em, 6vw, 5em);
+      color: rgba(255, 255, 255, 0.22);
+      animation: dotsPulse 1s ease-in-out infinite;
+    }
+
+    .overlay-hours {
+      background: linear-gradient(180deg, #a78bfa, #67e8f9);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .overlay-minutes {
+      background: linear-gradient(180deg, #f472b6, #fbbf24);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .overlay-right-side {
+      display: flex;
+      flex-direction: column;
+      margin-left: clamp(6px, 1.5vw, 12px);
+    }
+
+    .overlay-period, .overlay-seconds {
+      font-size: clamp(0.9em, 2vw, 1.3em);
+      font-weight: 500;
+    }
+
+    .overlay-period {
+      transform: translateY(-0.4em);
+      background: linear-gradient(180deg, #fbbf24, #fde68a);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .overlay-seconds {
+      transform: translateY(0.4em);
+      background: linear-gradient(180deg, #67e8f9, #a78bfa);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    /* 日历 */
+    .clock-overlay-date {
+      font-size: clamp(0.95em, 2vw, 1.3em);
+      font-weight: 500;
+      background: linear-gradient(135deg, #c084fc, #f472b6);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      opacity: 0.85;
+    }
+
+    .overlay-month-name, .overlay-day-name, .overlay-day-num {
+      margin-left: 0.3em;
+    }
+
+    /* 关闭按钮 */
+    .clock-overlay-close {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.65);
+      padding: 10px 28px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .clock-overlay-close:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 三点菜单 */
+    .clock-dot-menu-btn {
+      position: absolute;
+      top: 0; right: 0;
+      margin: 16px 18px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      z-index: 2;
+    }
+
+    .clock-dot-menu-btn:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .clock-dot-menu {
+      z-index: 999;
+      position: absolute;
+      top: 10px; right: 10px;
+      list-style: none;
+      background: rgba(25, 25, 45, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.3s ease;
+    }
+
+    .clock-dot-menu.active {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .clock-menu-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .clock-format-text {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.85em;
+      margin-right: 16px;
+    }
+
+    .clock-format-switch {
+      width: 36px; height: 18px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 75px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      position: relative;
+      transition: background 0.3s ease;
+    }
+
+    .clock-format-switch::before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      background: #f472b6;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(244, 114, 182, 0.35);
+      left: 2px;
+      transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.15);
+    }
+
+    .clock-format-switch.active::before {
+      background: #67e8f9;
+      box-shadow: 0 2px 8px rgba(103, 232, 249, 0.35);
+      transform: translateX(18px);
+    }
+
+    /* 手机端调整 */
+    @media screen and (max-width: 600px) {
+      .clock-overlay-panel {
+        padding: 36px 24px 28px;
+        border-radius: 22px;
+        gap: 10px;
+      }
+      .clock-overlay-panel::before {
+        border-radius: 24px;
+      }
+      .clock-overlay-close {
+        margin-top: 14px;
+        padding: 8px 22px;
+        font-size: 13px;
+      }
+      .clock-dot-menu-btn {
+        margin: 12px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 左侧面板：个人信息 -->
+  <div class="panel left-panel">
+    <h1>ALARMZXC的网页</h1>
+    <img src="./image/avatar.webp" alt="头像">
+    <p>你好啊<br>这里是ALARM<br>这是一个普通的网页</p>
+  </div>
+
+  <!-- 右侧面板：时间、日历和按钮 -->
+  <div class="clock-overlay" id="clockOverlay">
+  <div class="clock-overlay-bg"></div>
+  <div class="clock-overlay-panel">
+    <div class="clock-dot-menu-btn" id="overlayDotMenuBtn">
+      <i class="fas fa-ellipsis-v"></i>
+    </div>
+    <ul class="clock-dot-menu" id="overlayDotMenu">
+      <li class="clock-menu-item">
+        <span class="clock-format-text">24小时制</span>
+        <div class="clock-format-switch" id="overlayFormatSwitch" data-format="12"></div>
+      </li>
+    </ul>
+    <div class="clock-overlay-time">
+      <span class="overlay-hours">00</span>
+      <span class="overlay-dots">:</span>
+      <span class="overlay-minutes">00</span>
+      <div class="overlay-right-side">
+        <span class="overlay-period">AM</span>
+        <span class="overlay-seconds">00</span>
+      </div>
+    </div>
+    <div class="clock-overlay-date">
+      <span class="overlay-month-name">月</span>
+      <span class="overlay-day-num">00</span>日
+      <span class="overlay-day-name">星期</span>
+    </div>
+    <button class="clock-overlay-close" id="clockOverlayClose">
+      <i class="fas fa-times"></i> 返回
+    </button>
+  </div>
+</div>
+
+<div class="panel right-panel">
+    <!-- 右侧面板上部分：时间、日历 -->
+    <div class="right-panel-top">
+      <!-- 当前时间显示区域 -->
+      <div class="time">
+        <span class="hours">00</span><span class="dots">:</span><span class="minutes">00</span>
+        <div class="right-side">
+          <span class="period">AM</span>
+          <span class="seconds">00</span>
+        </div>
+      </div>
+
+      <!-- 日历显示区域 -->
+      <div class="calender">
+        <span class="month-name">月</span>
+        <span class="day-num">00</span>日，
+        <span class="day-name">星期</span>
+      </div>
+    </div>
+
+    <!-- 右侧面板下部分：按钮 -->
+    <div class="right-panel-bottom">
+      <!-- 按钮容器 -->
+      <div class="buttons-container">
+        <button class="action-button time-button" id="clockTrigger">
+          <i class="fas fa-clock"></i>
+          具体时间
+        </button>
+        <a href="deepseek_html and gemini.html" class="action-button intro-button">
+          <i class="fas fa-user"></i>
+          简介
+        </a>
+        <a href="photos.html" class="action-button photos-button">
+          <i class="fas fa-images"></i>
+          照片集
+        </a>
+        <a href="https://blog.alarm-zxc.cc" class="action-button blog-hexo">
+          <i class="fas fa-blog"></i>
+          参观博客
+        </a>
+        <a href="https://newsnow.alarmandcxz.dpdns.org" class="action-button news-button">
+          <i class="fas fa-newspaper"></i>
+          今日热点
+        </a>
+        <a href="https://achat.alarmandcxz.dpdns.org/auth" class="action-button achat-button">
+          <i class="fas fa-comments"></i>
+          聊天室
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 24小时制开关状态 =====
+    let is24h = false;
+
+    // ===== 统一时钟更新 =====
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      let m = now.getMinutes();
+      let s = now.getSeconds();
+      let period = h >= 12 ? 'PM' : 'AM';
+
+      // 12/24小时制
+      if (!is24h) {
+        if (h > 12) h = h % 12;
+        if (h === 0) h = 12;
+      }
+
+      // 格式化
+      h = h < 10 ? "0" + h : h;
+      m = m < 10 ? "0" + m : m;
+      s = s < 10 ? "0" + s : s;
+
+      // 更新主页迷你时钟
+      const setEl = (sel, val) => { const el = document.querySelector(sel); if (el) el.innerHTML = val; };
+      setEl(".hours", h);
+      setEl(".minutes", m);
+      setEl(".seconds", s);
+      const periodEl = document.querySelector('.period');
+      const oPeriodEl = document.querySelector('.overlay-period');
+      if (is24h) {
+        if (periodEl) periodEl.style.visibility = 'hidden';
+        if (oPeriodEl) oPeriodEl.style.visibility = 'hidden';
+      } else {
+        if (periodEl) { periodEl.style.visibility = 'visible'; periodEl.innerHTML = period; }
+        if (oPeriodEl) { oPeriodEl.style.visibility = 'visible'; oPeriodEl.innerHTML = period; }
+      }
+
+      // 更新叠加层大时钟
+      setEl(".overlay-hours", h);
+      setEl(".overlay-minutes", m);
+      setEl(".overlay-seconds", s);
+
+      // 更新日期
+      const day = now.toLocaleString("zh-CN", { weekday: "long" });
+      const month = now.toLocaleString("zh-CN", { month: "short" });
+      const date = now.getDate();
+      setEl(".month-name", month);
+      setEl(".day-name", day);
+      setEl(".day-num", date);
+      setEl(".overlay-month-name", month);
+      setEl(".overlay-day-name", day);
+      setEl(".overlay-day-num", date);
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ===== 时钟叠加层 开/关 =====
+    const clockOverlay = document.getElementById('clockOverlay');
+    const clockTrigger = document.getElementById('clockTrigger');
+    const clockOverlayClose = document.getElementById('clockOverlayClose');
+    const rightPanelTop = document.querySelector('.right-panel-top');
+    const leftPanel = document.querySelector('.left-panel');
+    const buttonsContainer = document.querySelector('.buttons-container');
+    const fadingTargets = [rightPanelTop, leftPanel, buttonsContainer].filter(Boolean);
+
+    function openClockOverlay() {
+      // 第一步：小时间卡片 + 左侧面板 + 按钮 先淡出
+      fadingTargets.forEach(el => el.classList.add('clock-fading'));
+      // 第二步：等它们消失后，显示叠加层
+      setTimeout(() => {
+        clockOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }, 300);
+    }
+
+    function closeClockOverlay() {
+      // 第一步：叠加层先消失
+      clockOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+      // 第二步：等叠加层消失后，小卡片回来
+      setTimeout(() => {
+        fadingTargets.forEach(el => el.classList.remove('clock-fading'));
+      }, 200);
+    }
+
+    clockTrigger.addEventListener('click', openClockOverlay);
+    clockOverlayClose.addEventListener('click', closeClockOverlay);
+
+    // 点击背景关闭
+    clockOverlay.addEventListener('click', (e) => {
+      if (e.target === clockOverlay) closeClockOverlay();
+    });
+
+    // ESC 关闭
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && clockOverlay.classList.contains('open')) {
+        closeClockOverlay();
+      }
+    });
+
+    // ===== 12/24小时制切换 =====
+    const overlayFormatSwitch = document.getElementById('overlayFormatSwitch');
+    const overlayFormatText = document.querySelector('.clock-format-text');
+
+    overlayFormatSwitch.addEventListener('click', () => {
+      overlayFormatSwitch.classList.toggle('active');
+      is24h = overlayFormatSwitch.classList.contains('active');
+      // 当前显示的是什么制式，文字就显示"切换到另一种"
+      overlayFormatText.textContent = is24h ? '12小时制' : '24小时制';
+      updateClock();
+    });
+
+    // ===== 三点菜单切换 =====
+    const overlayDotMenuBtn = document.getElementById('overlayDotMenuBtn');
+    const overlayDotMenu = document.getElementById('overlayDotMenu');
+
+    overlayDotMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      overlayDotMenu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!overlayDotMenu.contains(e.target) && e.target !== overlayDotMenuBtn) {
+        overlayDotMenu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
