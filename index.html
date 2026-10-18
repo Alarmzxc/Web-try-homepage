@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" data-clock="12h">
 <head>
   <meta charset="UTF-8">
@@ -107,6 +107,7 @@
     body.clock-open {
       overflow: hidden;
     }
+
 
     /* ===== 可聚焦元素统一焦点环 ===== */
     :focus-visible {
@@ -573,19 +574,28 @@
       justify-content: center;
       padding: 20px;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s var(--ease-out);
     }
 
     .clock-overlay.open {
       pointer-events: auto;
-      opacity: 1;
     }
 
+    /* 背景：先快速压暗，模糊半径再缓慢长大，避免「清晰层 + 模糊层」叠出重影和硬切 */
     .clock-overlay-bg {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.32);
+      opacity: 0;
+      backdrop-filter: blur(0px) saturate(1);
+      -webkit-backdrop-filter: blur(0px) saturate(1);
+      transition:
+        opacity 0.22s var(--ease-out),
+        backdrop-filter 0.55s var(--ease-out),
+        -webkit-backdrop-filter 0.55s var(--ease-out);
+    }
+
+    .clock-overlay.open .clock-overlay-bg {
+      opacity: 1;
       backdrop-filter: blur(20px) saturate(0.85);
       -webkit-backdrop-filter: blur(20px) saturate(0.85);
     }
@@ -607,13 +617,16 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: clamp(20px, 2.4vw, 28px);
       box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      transform: scale(0.96);
-      transition: transform 0.5s var(--ease-spring);
+      opacity: 0;
+      transform: scale(0.94);
+      transition: opacity 0.3s var(--ease-out), transform 0.5s var(--ease-spring);
     }
 
-    /* 打开后取消 transform，避免给菜单的 fixed 定位创建包含块 */
+    /* 打开后取消 transform，避免给菜单的 fixed 定位创建包含块；卡片比背景晚一点浮现 */
     .clock-overlay.open .clock-overlay-panel {
+      opacity: 1;
       transform: none;
+      transition-delay: 0.1s;
     }
 
     /* 发光边框光晕 */
@@ -1169,10 +1182,9 @@
         lastFocus = doc.activeElement;
         doc.body.classList.add('clock-open');
         overlay.setAttribute('aria-hidden', 'false');
-        openTimer = window.setTimeout(function () {
-          overlay.classList.add('open');
-          closeBtn.focus({ preventScroll: true });
-        }, 240);
+        /* 与内容淡出同时开始：背景立刻压暗，模糊半径慢慢长大，不留「裸露壁纸」的空档 */
+        overlay.classList.add('open');
+        closeBtn.focus({ preventScroll: true });
       }
 
       function closeOverlay() {
@@ -1188,7 +1200,7 @@
             lastFocus.focus({ preventScroll: true });
           }
           lastFocus = null;
-        }, 320);
+        }, 90);
       }
 
       trigger.addEventListener('click', openOverlay);
