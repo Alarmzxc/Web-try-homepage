@@ -2,76 +2,116 @@
 <html lang="zh-CN" class="preload">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1e293b" />
+  <meta name="description" content="Alarm 的个人图集，按分类浏览、关键词搜索、灯箱大图预览。" />
   <title>Alarm图集</title>
   <link rel="icon" href="./image/favicon.ico" />
   <style>
-    /* -------------------- 全局重置 & 变量 -------------------- */
+    /* ==================== 全局重置 & 变量 ==================== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: rgba(30, 41, 59, 0.98);
       --card-bg: rgba(51, 65, 85, 0.75);
       --text: #e2e8f0;
-      --muted: rgba(148, 163, 184, 0.75);
+      --muted: rgba(148, 163, 184, 0.95);
       --primary: #818cf8;
       --primary-2: #c084fc;
       --border: rgba(148, 163, 184, 0.18);
       --shadow: 0 12px 30px rgba(2, 6, 23, 0.35);
       --radius: 16px;
       --transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      --t-fast: 0.22s cubic-bezier(0.22, 1, 0.36, 1);
       --btn-bg: rgba(51, 65, 85, 0.55);
       --btn-hover-bg: rgba(129, 140, 248, 0.18);
       --chip-bg: rgba(51, 65, 85, 0.4);
       --chip-hover-bg: rgba(129, 140, 248, 0.12);
-      --page-btn-bg: rgba(51, 65, 85, 0.35);
-      --page-btn-hover-bg: rgba(129, 140, 248, 0.15);
+      --page-btn-bg: #26344a;
+      --page-btn-hover-bg: #334155;
+      --page-btn-border: rgba(148, 163, 184, 0.28);
       --lb-btn-bg: rgba(51, 65, 85, 0.7);
       --lb-btn-hover-bg: rgba(129, 140, 248, 0.22);
       --input-bg: rgba(51, 65, 85, 0.5);
       --input-focus-border: var(--primary);
       --input-focus-shadow: rgba(129, 140, 248, 0.15);
+      /* 层级：header 90 < 分页 100 < 灯箱 1000 < 跳过链接 2000 */
+      --z-header: 90;
+      --z-pag: 100;
+      --z-lb: 1000;
+      --pag-h: 64px;
+      --pag-bottom: 16px;
     }
     [data-theme="light"] {
       --bg: rgba(241, 245, 249, 0.98);
       --card-bg: rgba(255, 255, 255, 0.8);
       --text: #1e293b;
-      --muted: rgba(100, 116, 139, 0.7);
+      --muted: rgba(71, 85, 105, 0.88);
       --border: rgba(148, 163, 184, 0.25);
       --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
       --btn-bg: rgba(255, 255, 255, 0.7);
       --btn-hover-bg: rgba(59, 130, 246, 0.12);
       --chip-bg: rgba(255, 255, 255, 0.6);
       --chip-hover-bg: rgba(59, 130, 246, 0.1);
-      --page-btn-bg: rgba(255, 255, 255, 0.6);
-      --page-btn-hover-bg: rgba(59, 130, 246, 0.1);
+      --page-btn-bg: #ffffff;
+      --page-btn-hover-bg: #f8fafc;
+      --page-btn-border: rgba(100, 116, 139, 0.34);
       --lb-btn-bg: rgba(255, 255, 255, 0.75);
       --lb-btn-hover-bg: rgba(59, 130, 246, 0.15);
       --input-bg: rgba(255, 255, 255, 0.7);
       --input-focus-border: #3b82f6;
       --input-focus-shadow: rgba(59, 130, 246, 0.15);
     }
-    html { height: 100%; background: var(--bg); }
+    html { height: 100%; background: var(--bg); color-scheme: dark; scroll-behavior: smooth; }
+    [data-theme="light"] html, html[data-theme="light"] { color-scheme: light; }
+    /* 灯箱打开时锁定页面滚动，并补偿滚动条宽度避免整页跳动 */
+    html.lb-open { overflow: hidden; padding-right: var(--sb, 0px); }
     body {
-      min-height: 100vh;
+      min-height: 100dvh;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
       color: var(--text);
       background: transparent;
       transition: background var(--transition);
       opacity: 0;
       animation: fadeIn 0.6s ease forwards;
+      -webkit-tap-highlight-color: transparent;
     }
     @keyframes fadeIn { to { opacity: 1; } }
 
-    .container { max-width: 1240px; margin: 0 auto; padding: 20px 20px 90px; }
+    /* 键盘焦点统一样式 */
+    :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 
-    /* -------------------- 头部 -------------------- */
+    /* 跳过导航（键盘用户） */
+    .skip {
+      position: fixed; left: 12px; top: -80px; z-index: 2000;
+      padding: 12px 16px; border-radius: 0 0 12px 12px;
+      background: var(--btn-bg); backdrop-filter: blur(8px);
+      color: var(--text); text-decoration: none; font-size: 14px;
+      border: 1px solid var(--border); border-top: 0;
+      transition: top var(--t-fast);
+    }
+    .skip:focus { top: 0; }
+
+    /* 仅屏幕阅读器可见 */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      /* 底部为悬浮分页让位：按钮组高度(JS 实测) + 距底距离 + 呼吸间隙 */
+      padding: 20px 20px calc(var(--pag-h) + var(--pag-bottom) + env(safe-area-inset-bottom, 0px) + 12px);
+    }
+
+    /* ==================== 头部 ==================== */
     .hero-bar {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 8px 0 12px;
-      margin-bottom: 6px;
+      gap: 0;
+      padding: 4px 0 0;
+      margin-bottom: 2px;
     }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand .logo {
@@ -79,11 +119,13 @@
       border-radius: 10px;
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       box-shadow: 0 4px 12px rgba(129, 140, 248, 0.25);
+      flex-shrink: 0;
     }
     .brand h1 {
       font-size: 26px; font-weight: 600; letter-spacing: 0.5px;
       background: linear-gradient(135deg, #fff 0%, #e0e7ff 40%, #f3e8ff 80%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-wrap: balance;
     }
     [data-theme="light"] .brand h1 {
       background: linear-gradient(135deg, #1e293b, #475569);
@@ -91,109 +133,84 @@
     }
     .sub {
       font-size: 13px; color: var(--muted);
-      display: flex; align-items: center; gap: 6px;
-      margin-top: 2px;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap; justify-content: center;
+      min-height: 20px;
     }
     .sub code { background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; font-size: 12px; }
     [data-theme="light"] .sub code { background: rgba(0,0,0,0.06); }
+    .sub .dot { opacity: 0.5; }
+
+    /* 搜索 + 分类同排，减少头部高度 */
     .controls-row {
       display: flex; align-items: center; justify-content: center;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
+      margin-top: 16px;
     }
     /* 搜索框 */
     .input {
       display: flex; align-items: center; gap: 8px;
-      padding: 10px 20px;
+      padding: 12px 16px 12px 20px;
       border-radius: 40px;
       background: var(--input-bg);
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       border: 1px solid var(--border);
-      transition: var(--transition);
+      transition: background var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast);
       width: clamp(280px, 33vw, 420px);
       max-width: 100%;
+      min-height: 44px;
     }
     .input:focus-within { border-color: var(--input-focus-border); box-shadow: 0 0 0 3px var(--input-focus-shadow); }
     .input svg { width: 20px; height: 20px; color: var(--muted); flex-shrink: 0; }
     .input input {
       all: unset; width: 100%; font-size: 15px; color: var(--text);
-      background: transparent;
+      background: transparent; min-width: 0;
+      /* 保证输入框本身也是合格的点击区域（all:unset 会压到 19px 高） */
+      min-height: 24px;
+      line-height: 24px;
     }
-    .theme-toggle .icon-inner {
-      display: inline-block;
-      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    .input input::placeholder { color: var(--muted); }
+    .input input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+    .input .clear {
+      all: unset; cursor: pointer; flex-shrink: 0;
+      width: 22px; height: 22px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; line-height: 1; color: var(--muted);
+      background: rgba(148, 163, 184, 0.16);
+      transition: background var(--t-fast), color var(--t-fast);
     }
-    [data-theme="dark"] .theme-toggle .icon-inner {
-      transform: rotate(180deg);
-    }
-    [data-theme="light"] .theme-toggle .icon-inner {
-      transform: rotate(0deg);
-    }
-    .preload .theme-toggle .icon-inner {
-      transition: none !important;
-    }
-
-    /* 右上工具行：首页按钮 + 主题切换 */
-    .tools-row {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      display: flex;
-      gap: 8px;
-      z-index: 100;
-    }
-    .tools-row .back-btn,
-    .tools-row .theme-toggle {
-      background: var(--btn-bg);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border: 1px solid var(--border);
-      border-radius: 40px;
-      color: var(--text);
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-weight: 500;
-      font-family: inherit;
-      font-size: 14px;
-      padding: 9px 15px;
-      line-height: 1;
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      height: 38px;
-      min-width: 38px;
-      box-sizing: border-box;
-    }
-    .tools-row .back-btn:hover,
-    .tools-row .theme-toggle:hover {
-      transform: translateY(-2px);
-      background: var(--btn-hover-bg);
-      box-shadow: 0 0 16px rgba(129,140,248,0.2);
-    }
+    .input .clear:hover { background: var(--chip-hover-bg); color: var(--text); }
+    .input .clear[hidden] { display: none; }
 
     /* 分类 chips */
     .chips {
       display: flex; flex-wrap: wrap; gap: 8px;
-      margin-top: 6px;
       justify-content: center;
+      min-width: 0;
     }
+    .chips[hidden] { display: none; }
     .chip {
-      padding: 8px 18px;
+      padding: 8px 20px;
       font-size: 14px;
       border-radius: 40px;
       border: 1px solid var(--border);
       background: var(--chip-bg);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       color: var(--muted);
       cursor: pointer;
-      transition: var(--transition);
+      transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
       user-select: none;
       font-weight: 500;
+      font-family: inherit;
+      line-height: 1.2;
+      min-height: 38px;
     }
-    .chip:hover { background: var(--chip-hover-bg); transform: translateY(-1px); }
+    .chip:hover { background: var(--chip-hover-bg); transform: translateY(-1px); color: var(--text); }
+    .chip:active { transform: translateY(0) scale(0.98); }
     .chip.active {
       background: linear-gradient(135deg, rgba(129,140,248,0.2), rgba(192,132,252,0.2));
       border-color: rgba(139,92,246,0.4);
@@ -206,36 +223,87 @@
       color: #1e293b;
     }
 
-    /* 加载状态 */
-    .loading-tip {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-      font-size: 15px;
-      grid-column: 1 / -1;
+    /* 右上工具行：首页按钮 + 主题切换 */
+    .tools-row {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: var(--z-header);
     }
-    .loading-tip .spinner {
+    .tools-row .back-btn,
+    .tools-row .theme-toggle {
+      background: var(--btn-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 500;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 0 16px;
+      line-height: 1;
+      transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+      height: 38px;
+      min-width: 38px;
+      box-sizing: border-box;
+    }
+    .tools-row .back-btn:hover,
+    .tools-row .theme-toggle:hover {
+      transform: translateY(-2px);
+      background: var(--btn-hover-bg);
+      box-shadow: 0 0 16px rgba(129,140,248,0.2);
+    }
+    .tools-row .back-btn:active,
+    .tools-row .theme-toggle:active { transform: translateY(0) scale(0.97); }
+    .theme-toggle .icon-inner {
       display: inline-block;
-      width: 32px; height: 32px;
-      border: 3px solid var(--border);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 12px;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    [data-theme="dark"] .theme-toggle .icon-inner { transform: rotate(180deg); }
+    [data-theme="light"] .theme-toggle .icon-inner { transform: rotate(0deg); }
+    .preload .theme-toggle .icon-inner { transition: none !important; }
 
-    /* -------------------- 网格 · 卡片 -------------------- */
+    /* ==================== 提示条 ==================== */
+    .notice {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; flex-wrap: wrap;
+      margin: 16px 0 0;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+    }
+    .notice[hidden] { display: none; }
+    .notice button {
+      flex-shrink: 0;
+      font: inherit; font-size: 12px;
+      padding: 5px 12px; border-radius: 40px;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background var(--t-fast), border-color var(--t-fast);
+    }
+    .notice button:hover { background: var(--chip-hover-bg); border-color: var(--primary); }
+
+    /* ==================== 网格 · 卡片 ==================== */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 22px;
+      gap: 24px;
       margin-top: 20px;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
     }
-    .grid.loaded { opacity: 1; transform: translateY(0); }
 
     .card {
       position: relative;
@@ -245,17 +313,22 @@
       box-shadow: var(--shadow);
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
       cursor: pointer;
-      backdrop-filter: blur(2px);
       border: 1px solid var(--border);
-      will-change: transform;
+      /* backwards：动画结束后回落到常规样式，hover 的 transform 才不会被锁死 */
+      animation: cardIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+      animation-delay: var(--d, 0ms);
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
     }
     .card:hover {
       transform: translateY(-6px) scale(1.01);
       box-shadow: 0 20px 40px rgba(2, 6, 23, 0.35);
     }
-    [data-theme="light"] .card:hover {
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    }
+    .card:active { transform: translateY(-2px) scale(0.995); }
+    [data-theme="light"] .card:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12); }
+
     .thumb {
       width: 100%;
       padding-bottom: 62%;
@@ -263,29 +336,50 @@
       background: rgba(0,0,0,0.15);
       overflow: hidden;
     }
+    [data-theme="light"] .thumb { background: rgba(148, 163, 184, 0.15); }
+    /* 图片未就绪时的流动微光，避免出现"空白破图"的观感 */
+    .thumb::before {
+      content: '';
+      position: absolute; inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(148,163,184,0.16), transparent);
+      animation: shimmer 1.4s infinite;
+      pointer-events: none;
+    }
+    .thumb.is-loaded::before,
+    .thumb.is-error::before { display: none; }
     .thumb img {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
       object-fit: cover;
-      transition: transform 0.5s ease, filter 0.4s ease;
+      transition: transform 0.5s ease, filter 0.4s ease, opacity 0.3s ease;
       filter: brightness(0.98) saturate(1.02);
     }
     [data-theme="dark"] .thumb img { filter: brightness(0.85) saturate(1.05); }
     .card:hover .thumb img { transform: scale(1.04); }
+    /* 图片加载失败：隐藏破图，给出文字提示 */
+    .thumb.is-error img { opacity: 0; }
+    .thumb.is-error::after {
+      content: '图片加载失败';
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
+      font-size: 13px; color: var(--muted);
+      letter-spacing: 0.02em;
+    }
 
     .card-info {
       position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 16px 16px 12px;
-      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
-      transform: translateY(70%);
+      padding: 24px 16px 12px;
+      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%);
+      transform: translateY(72%);
       opacity: 0;
       transition: transform 0.35s ease, opacity 0.35s ease;
       pointer-events: none;
     }
-    .card:hover .card-info {
+    .card:hover .card-info,
+    .card:focus-visible .card-info {
       transform: translateY(0);
       opacity: 1;
-      pointer-events: auto;
     }
     .card-title {
       font-size: 15px; font-weight: 500;
@@ -293,84 +387,144 @@
       margin-bottom: 2px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .card-category {
-      font-size: 12px; color: rgba(255,255,255,0.7);
-    }
+    .card-category { font-size: 12px; color: rgba(255,255,255,0.7); }
     [data-theme="light"] .card-info {
       background: linear-gradient(to top, rgba(15,23,42,0.75) 0%, transparent 100%);
     }
     [data-theme="light"] .card-title { color: #fff; }
     [data-theme="light"] .card-category { color: rgba(255,255,255,0.75); }
+    /* 触屏设备没有 hover：标题与分类常驻 */
+    @media (hover: none) {
+      .card .card-info { transform: translateY(0); opacity: 1; }
+    }
 
-    /* -------------------- 分页 -------------------- */
+    /* 骨架屏 */
+    .skel {
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .skel-thumb { padding-bottom: 62%; position: relative; overflow: hidden; }
+    .skel-thumb::after {
+      content: '';
+      position: absolute; inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(148,163,184,0.14), transparent);
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+    /* 空状态 / 错误状态 */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 64px 20px 56px;
+      color: var(--muted);
+    }
+    .empty .emoji { display: block; font-size: 44px; line-height: 1; margin-bottom: 16px; }
+    .empty .title { color: var(--text); font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .empty p { font-size: 14px; line-height: 1.75; }
+    .empty .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+    .btn {
+      font: inherit; font-size: 14px; font-weight: 500;
+      padding: 9px 20px; border-radius: 40px;
+      background: var(--btn-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+    }
+    .btn:hover { background: var(--btn-hover-bg); border-color: var(--primary); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0) scale(0.98); }
+
+    /* ==================== 分页：悬浮按钮组（无整条底栏） ==================== */
     .pagination {
+      position: fixed;
+      left: 50%;
+      /* 距底距离 + 刘海屏安全区，容器留白复用同一个 --pag-bottom */
+      bottom: calc(var(--pag-bottom) + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
       display: flex; justify-content: center; align-items: center;
       gap: 8px;
-      margin: 0;
-      padding: 10px 20px;
+      padding: 8px;
       flex-wrap: wrap;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: var(--bg);
-      backdrop-filter: blur(14px);
-      border-top: 1px solid var(--border);
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      width: max-content;
+      max-width: calc(100vw - 24px);
+      z-index: var(--z-pag);
+      /* 不再有整条底栏，每个按钮自己带玻璃底 */
+      background: none;
+      border: 0;
+      box-shadow: none;
     }
+    .pagination[hidden] { display: none; }
     .page-btn {
       min-width: 40px; height: 40px;
-      border-radius: 40px;
-      border: 1px solid var(--border);
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--page-btn-border);
       background: var(--page-btn-bg);
-      backdrop-filter: blur(4px);
+      /* 背景已接近不透明，不再用 backdrop-filter：悬停在滚动列表上方时省一次全屏模糊 */
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.10), 0 8px 24px rgba(15, 23, 42, 0.16);
       color: var(--text);
+      font-family: inherit;
       font-size: 14px;
       font-weight: 450;
       cursor: pointer;
-      transition: var(--transition);
+      transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
       display: inline-flex; align-items: center; justify-content: center;
+      font-variant-numeric: tabular-nums;
     }
     .page-btn:hover:not(:disabled) {
       background: var(--page-btn-hover-bg);
+      border-color: rgba(139, 92, 246, 0.4);
       transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.16), 0 12px 28px rgba(15, 23, 42, 0.22);
     }
+    .page-btn:active:not(:disabled) { transform: translateY(0) scale(0.96); }
     .page-btn.active {
-      background: linear-gradient(135deg, rgba(129,140,248,0.25), rgba(192,132,252,0.25));
-      border-color: rgba(139,92,246,0.4);
-      color: var(--text);
-      font-weight: 500;
+      background: linear-gradient(135deg, rgba(129,140,248,0.95), rgba(192,132,252,0.95));
+      border-color: transparent;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(129, 140, 248, 0.35);
     }
     [data-theme="light"] .page-btn.active {
-      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
-      border-color: rgba(59,130,246,0.3);
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
     }
-    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .ellipsis { color: var(--muted); padding: 0 4px; font-size: 14px; }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    .ellipsis { color: var(--muted); padding: 0 2px; font-size: 14px; user-select: none; }
 
-    /* -------------------- 灯箱 -------------------- */
+    /* ==================== 灯箱 ==================== */
     .lightbox {
       position: fixed; inset: 0;
-      display: none;
+      display: flex;
       align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.75);
+      background: rgba(15,23,42,0.86);
       backdrop-filter: blur(16px);
-      z-index: 1000;
+      -webkit-backdrop-filter: blur(16px);
+      z-index: var(--z-lb);
+      /* 用 visibility 而不是 display 切换，淡入淡出才能真的生效 */
       opacity: 0;
-      transition: opacity 0.3s ease;
+      visibility: hidden;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
+      overscroll-behavior: contain;
     }
-    .lightbox.open { display: flex; opacity: 1; }
-    [data-theme="light"] .lightbox { background: rgba(241,245,249,0.85); }
+    .lightbox.open { opacity: 1; visibility: visible; }
 
     .lb-inner {
       max-width: 94vw; max-height: 94vh;
       position: relative;
       display: flex; flex-direction: column; align-items: center;
+      justify-content: center;
     }
     .lb-img-container {
       position: relative;
       display: flex; align-items: center; justify-content: center;
+      min-width: 200px;
+      min-height: 140px;
     }
     .lb-img {
       max-width: 90vw; max-height: 80vh;
@@ -379,16 +533,42 @@
       transform: scale(0.96);
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
+    .lb-img[hidden] { display: none; }
     .lightbox.open .lb-img { transform: scale(1); }
+    .lb-spinner {
+      position: absolute; top: 50%; left: 50%;
+      width: 34px; height: 34px; margin: -17px 0 0 -17px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.22);
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+    }
+    .lb-spinner[hidden] { display: none; }
+    .lb-error {
+      font-size: 14px; color: rgba(226, 232, 240, 0.85);
+      padding: 24px 20px; text-align: center; line-height: 1.7;
+    }
+    .lb-error[hidden] { display: none; }
+
+    .lb-foot {
+      display: flex; align-items: baseline; justify-content: center;
+      gap: 12px; flex-wrap: wrap;
+      margin-top: 12px;
+      max-width: min(90vw, 680px);
+      padding: 0 12px;
+    }
     .lb-cap {
       color: #e5e7eb;
       text-align: center;
-      margin-top: 12px;
       font-size: 14px;
-      padding: 0 20px;
-      max-width: 600px;
+      line-height: 1.5;
     }
-    [data-theme="light"] .lb-cap { color: #1e293b; }
+    .lb-counter {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
 
     .lb-actions {
       position: fixed; top: 20px; right: 20px;
@@ -398,16 +578,20 @@
     .lb-actions button {
       background: var(--lb-btn-bg);
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 40px;
       padding: 8px 16px;
+      font-family: inherit;
       font-size: 14px;
       cursor: pointer;
-      transition: var(--transition);
+      transition: background var(--t-fast), transform var(--t-fast);
       display: flex; align-items: center; gap: 6px;
     }
-    .lb-actions button:hover { transform: translateY(-2px); background: var(--lb-btn-hover-bg); }
+    .lb-actions button:hover:not(:disabled) { transform: translateY(-2px); background: var(--lb-btn-hover-bg); }
+    .lb-actions button:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+    .lb-actions button:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .lb-nav {
       position: absolute; top: 50%; left: 20px; right: 20px;
@@ -420,30 +604,79 @@
       pointer-events: auto;
       background: var(--lb-btn-bg);
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       border: 1px solid var(--border);
-      border-radius: 40px;
-      padding: 12px 16px;
-      font-size: 20px;
+      border-radius: 8px;
+      width: 48px; height: 48px;
+      padding: 0;
+      font-size: 18px;
+      line-height: 1;
       color: var(--text);
       cursor: pointer;
-      transition: var(--transition);
+      transition: background var(--t-fast), transform var(--t-fast), opacity var(--t-fast);
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      display: inline-flex; align-items: center; justify-content: center;
     }
-    .lb-nav button:hover { background: var(--lb-btn-hover-bg); transform: scale(1.08); }
+    .lb-nav button:hover:not(:disabled) { background: var(--lb-btn-hover-bg); transform: scale(1.08); }
+    .lb-nav button:active:not(:disabled) { transform: scale(0.98); }
+    .lb-nav button:disabled { opacity: 0.25; cursor: not-allowed; }
 
+    /* ==================== 响应式 ==================== */
     @media (max-width: 700px) {
-      .lb-nav { left: 12px; right: 12px; top: auto; bottom: 24px; transform: none; }
-      .lb-nav button { padding: 10px 14px; font-size: 18px; }
-      .lb-actions { top: 12px; right: 12px; gap: 8px; }
-      .lb-actions button { padding: 6px 12px; font-size: 13px; }
-      .lb-img { max-width: 94vw; max-height: 70vh; }
-      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
-      .hero-bar { gap: 10px; }
-      .controls-row { flex-wrap: wrap; }
-      .input { width: 88vw; max-width: 400px; }
-      .tools-row { top: 10px; right: 10px; gap: 6px; }
+      .container { padding: 16px 16px calc(var(--pag-h) + var(--pag-bottom) + env(safe-area-inset-bottom, 0px) + 8px); }
+      .brand h1 { font-size: 22px; }
+      .brand .logo { width: 28px; height: 28px; border-radius: 9px; }
+      .controls-row { margin-top: 12px; gap: 12px; }
+      .input { width: 100%; max-width: 420px; }
+      .chips { width: 100%; }
+      .chip { padding: 8px 16px; font-size: 13px; min-height: 36px; }
+
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      /* 工具行改为图标模式，避免与居中标题挤在一起 */
+      .tools-row { top: 12px; right: 12px; gap: 8px; }
+      .tools-row .back-btn { padding: 8px 12px; }
+      .tools-row .back-btn .label { display: none; }
       .tools-row .back-btn,
-      .tools-row .theme-toggle { font-size: 13px; padding: 7px 12px; height: 34px; }
+      .tools-row .theme-toggle { height: 36px; min-width: 36px; font-size: 14px; }
+
+      .pagination { gap: 6px; padding: 6px; }
+      .page-btn { min-width: 40px; height: 40px; font-size: 13px; padding: 0 10px; }
+
+      /* 灯箱：导航移到底部，给文字留出空间 */
+      .lb-inner { padding-bottom: 64px; max-height: 100vh; }
+      .lb-nav {
+        left: 12px; right: 12px;
+        top: auto; bottom: 8px;
+        transform: none;
+      }
+      .lb-nav button { width: 44px; height: 44px; padding: 0; border-radius: 8px; font-size: 16px; }
+      .lb-actions { top: 12px; right: 12px; gap: 8px; }
+      .lb-actions button { padding: 8px 12px; font-size: 13px; }
+      .lb-img { max-width: 94vw; max-height: 68vh; }
+      .lb-foot { margin-top: 12px; gap: 8px; }
+      .lb-cap { font-size: 13px; }
+    }
+
+    /* 超窄屏（<=420px）：右上角按钮与居中标题会挤在同一条水平线上，
+       用顶部留白把它们分到两行，标题保持居中不被遮挡 */
+    @media (max-width: 420px) {
+      .hero-bar { padding-top: 44px; }
+    }
+
+    /* 减弱动画偏好 */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+      .card { animation: none; }
     }
 
     .file-btn { display: none !important; }
@@ -451,6 +684,8 @@
   </style>
 </head>
 <body>
+<a class="skip" href="#grid">跳到图集</a>
+
 <div class="container">
   <header class="hero-bar">
     <div class="brand">
@@ -459,401 +694,963 @@
     </div>
     <div class="sub">
       <span>📁 从 <code>photos.json</code> 读取</span>
-      <span style="opacity:0.5;">·</span>
-      <span id="countDisplay">加载中...</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span id="countDisplay">加载中…</span>
     </div>
-    <div class="controls-row">
-      <div class="input" role="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="7.5"/><path d="M16.5 16.5L21 21"/></svg>
-        <input id="q" placeholder="搜索标题 / 分类…" autocomplete="off" />
-      </div>
-    </div>
-    <div class="chips" id="chips" aria-label="分类"></div>
+
     <div class="tools-row">
-      <a href="./index.html" class="back-btn" aria-label="返回首页">🏠 首页</a>
-      <button class="theme-toggle" id="themeToggle" aria-label="切换主题"><span class="icon-inner">🌓</span></button>
+      <a href="./index.html" class="back-btn" aria-label="返回首页">
+        <span aria-hidden="true">🏠</span><span class="label">首页</span>
+      </a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题">
+        <span class="icon-inner" aria-hidden="true">🌓</span>
+      </button>
     </div>
   </header>
 
+  <div class="controls-row">
+    <div class="input" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="7.5"/><path d="M16.5 16.5L21 21"/>
+      </svg>
+      <input id="q" type="search" placeholder="搜索标题 / 分类…" autocomplete="off"
+             aria-label="搜索标题或分类" enterkeyhint="search" />
+      <button class="clear" id="clearQ" type="button" aria-label="清除搜索" hidden>✕</button>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="按分类筛选"></div>
+  </div>
+
+  <div class="notice" id="notice" role="status" hidden>
+    <span id="noticeText"></span>
+    <button type="button" id="noticeClose">知道了</button>
+  </div>
+
   <main>
-    <section class="grid" id="grid" aria-live="polite">
-      <div class="loading-tip">
-        <div class="spinner"></div>
-        <div>加载图片数据...</div>
-      </div>
-    </section>
+    <p class="sr-only" id="status" role="status" aria-live="polite"></p>
+    <section class="grid" id="grid"></section>
   </main>
 </div>
 
+<nav class="pagination" id="pagination" aria-label="分页" hidden></nav>
+
 <!-- 灯箱 -->
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
   <div class="lb-actions">
-    <button id="download" aria-label="下载图片">⬇️ 下载</button>
-    <button id="close" aria-label="关闭">✕ 关闭</button>
+    <button id="download" type="button" aria-label="下载图片">⬇️ 下载</button>
+    <button id="close" type="button" aria-label="关闭预览">✕ 关闭</button>
   </div>
   <div class="lb-nav">
-    <button id="prev" aria-label="上一张">◀</button>
-    <button id="next" aria-label="下一张">▶</button>
+    <button id="prev" type="button" aria-label="上一张">◀</button>
+    <button id="next" type="button" aria-label="下一张">▶</button>
   </div>
   <div class="lb-inner">
-    <div class="lb-img-container">
-      <img id="lbImg" class="lb-img" alt="预览图" />
+    <div class="lb-img-container" id="lbStage">
+      <img id="lbImg" class="lb-img" alt="" />
+      <div class="lb-spinner" id="lbSpinner" hidden></div>
+      <div class="lb-error" id="lbError" hidden>图片加载失败，试试下一张</div>
     </div>
-    <div id="lbCap" class="lb-cap"></div>
+    <div class="lb-foot">
+      <span id="lbCap" class="lb-cap"></span>
+      <span id="lbCounter" class="lb-counter"></span>
+    </div>
   </div>
 </div>
 
 <script>
-  (function(){
-    "use strict";
+  (function () {
+    'use strict';
 
-    // -------------------- 主题 --------------------
-    const themeToggle = document.getElementById('themeToggle');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    let currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
-    function setTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-      currentTheme = theme;
+    var PAGE_SIZE = 24;
+    var root = document.documentElement;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    /* ==================== 主题 ==================== */
+    var themeToggle = document.getElementById('themeToggle');
+    var themeMeta = document.querySelector('meta[name="theme-color"]');
+    var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function readStoredTheme() {
+      try { return localStorage.getItem('theme'); } catch (e) { return null; }
     }
-    setTheme(currentTheme);
+    function storeTheme(t) {
+      try { localStorage.setItem('theme', t); } catch (e) { /* 隐私模式下忽略 */ }
+    }
+
+    var userTheme = readStoredTheme();
+    var currentTheme = userTheme || (systemDark.matches ? 'dark' : 'light');
+
+    function applyTheme(t) {
+      root.setAttribute('data-theme', t);
+      root.style.colorScheme = t;
+      if (themeMeta) themeMeta.setAttribute('content', t === 'dark' ? '#1e293b' : '#f1f5f9');
+      if (themeToggle) {
+        themeToggle.setAttribute('aria-label', t === 'dark' ? '切换到浅色主题' : '切换到深色主题');
+      }
+    }
+    applyTheme(currentTheme);
+
     // 延迟移除 preload，确保初始状态已渲染后再启用过渡动画
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.documentElement.classList.remove('preload');
-      });
-    });
-    themeToggle.addEventListener('click', () => {
-      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { root.classList.remove('preload'); });
     });
 
-    // -------------------- DOM 引用 --------------------
-    const els = {
-      chips: document.getElementById('chips'),
-      grid: document.getElementById('grid'),
-      q: document.getElementById('q'),
-      countDisplay: document.getElementById('countDisplay'),
-      lb: document.getElementById('lightbox'),
-      lbImg: document.getElementById('lbImg'),
-      lbCap: document.getElementById('lbCap'),
-      prev: document.getElementById('prev'),
-      next: document.getElementById('next'),
-      close: document.getElementById('close'),
-      download: document.getElementById('download')
+    themeToggle.addEventListener('click', function () {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      userTheme = currentTheme;
+      storeTheme(currentTheme);
+      applyTheme(currentTheme);
+    });
+
+    // 用户没手动选过主题时，跟随系统切换
+    systemDark.addEventListener('change', function (e) {
+      if (userTheme) return;
+      currentTheme = e.matches ? 'dark' : 'light';
+      applyTheme(currentTheme);
+    });
+
+    /* ==================== DOM 引用 ==================== */
+    var $ = function (id) { return document.getElementById(id); };
+    var els = {
+      chips: $('chips'),
+      grid: $('grid'),
+      q: $('q'),
+      clearQ: $('clearQ'),
+      countDisplay: $('countDisplay'),
+      status: $('status'),
+      notice: $('notice'),
+      noticeText: $('noticeText'),
+      noticeClose: $('noticeClose'),
+      pagination: $('pagination'),
+      lb: $('lightbox'),
+      lbImg: $('lbImg'),
+      lbCap: $('lbCap'),
+      lbCounter: $('lbCounter'),
+      lbSpinner: $('lbSpinner'),
+      lbError: $('lbError'),
+      lbStage: $('lbStage'),
+      prev: $('prev'),
+      next: $('next'),
+      close: $('close'),
+      download: $('download')
     };
 
-    // -------------------- 数据标准化 --------------------
+    /* ==================== 数据标准化 ==================== */
     function normalize(input) {
       if (!input) return [];
       if (!Array.isArray(input)) {
-        const url = input.url || input.avatar || input.src;
-        const caption = input.caption || input.name || input.title || '';
-        const category = input.category || '未分类';
-        return [{ category, photos: [{ url, caption }] }];
+        var url0 = input.url || input.avatar || input.src;
+        if (!url0) return [];
+        return [{
+          category: input.category || '未分类',
+          photos: [{ url: url0, caption: input.caption || input.name || input.title || '' }]
+        }];
       }
-      if (Array.isArray(input) && input.length && input[0] && Array.isArray(input[0].photos)) {
-        return input.map(g => ({
-          category: g.category || g.title || '未分类',
-          photos: (g.photos||[]).map(p => ({ url: p.url || p.avatar || p.src, caption: p.caption || p.name || p.title || '' }))
-        }));
+      if (input.length && input[0] && Array.isArray(input[0].photos)) {
+        return input.map(function (g) {
+          return {
+            category: g.category || g.title || '未分类',
+            photos: (g.photos || [])
+              .map(function (p) {
+                return {
+                  url: p && (p.url || p.avatar || p.src),
+                  caption: (p && (p.caption || p.name || p.title)) || ''
+                };
+              })
+              .filter(function (p) { return !!p.url; })
+          };
+        }).filter(function (g) { return g.photos.length > 0; });
       }
-      if (Array.isArray(input)) {
-        const map = new Map();
-        for (const item of input) {
-          const url = item.url || item.avatar || item.src;
-          if (!url) continue;
-          const caption = item.caption || item.name || item.title || '';
-          const category = item.category || '未分类';
-          if (!map.has(category)) map.set(category, []);
-          map.get(category).push({ url, caption });
-        }
-        return [...map.entries()].map(([category, photos]) => ({ category, photos }));
+      var map = new Map();
+      for (var i = 0; i < input.length; i++) {
+        var item = input[i];
+        if (!item) continue;
+        var url = item.url || item.avatar || item.src;
+        if (!url) continue;
+        var cat = item.category || '未分类';
+        if (!map.has(cat)) map.set(cat, []);
+        map.get(cat).push({ url: url, caption: item.caption || item.name || item.title || '' });
       }
-      return [];
+      return Array.from(map.entries()).map(function (entry) {
+        return { category: entry[0], photos: entry[1] };
+      });
     }
 
-    // -------------------- 状态 --------------------
-    const state = {
-      data: [],
-      flat: [],
-      filterCat: '全部',
-      q: '',
-      visible: [],
-      page: 1,
-      pageSize: 24
-    };
-
-    // -------------------- 工具函数 --------------------
     function buildFlat(data) {
-      const flat = [];
-      for (const g of data) {
-        for (const p of g.photos) {
-          if (p && p.url) flat.push({ url: p.url, caption: p.caption || '', category: g.category });
+      var flat = [];
+      for (var i = 0; i < data.length; i++) {
+        var g = data[i];
+        for (var j = 0; j < g.photos.length; j++) {
+          var p = g.photos[j];
+          if (p && p.url) {
+            flat.push({ url: p.url, caption: p.caption || '', category: g.category || '未分类' });
+          }
         }
       }
       return flat;
     }
 
     function uniqueCats(data) {
-      const set = new Set();
-      data.forEach(g => set.add(g.category || '未分类'));
-      return ['全部', ...[...set].sort((a,b) => a.localeCompare(b, 'zh'))];
+      var set = new Set();
+      data.forEach(function (g) { set.add(g.category || '未分类'); });
+      return ['全部'].concat(Array.from(set).sort(function (a, b) { return a.localeCompare(b, 'zh'); }));
     }
 
-    // -------------------- 渲染 --------------------
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.src = img.dataset.src;
-          io.unobserve(img);
+    /* ==================== 稳定随机排序 ====================
+       原来每次渲染都 Math.random() 洗牌，导致翻页后同一张图会重复或丢失。
+       这里用「种子随机」：同一组筛选条件永远得到同一顺序，翻页稳定。 */
+    function hashSeed(str) {
+      var h = 2166136261 >>> 0;
+      for (var i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        var t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    function shuffled(list, seedKey) {
+      var out = list.slice();
+      var rnd = mulberry32(hashSeed(seedKey));
+      for (var i = out.length - 1; i > 0; i--) {
+        var j = Math.floor(rnd() * (i + 1));
+        var tmp = out[i]; out[i] = out[j]; out[j] = tmp;
+      }
+      return out;
+    }
+
+    /* ==================== 状态 ==================== */
+    var state = {
+      data: [],
+      flat: [],
+      visible: [],
+      filterCat: '全部',
+      q: '',
+      page: 1,
+      pageSize: PAGE_SIZE,
+      isDemo: false
+    };
+
+    /* ==================== 懒加载 ====================
+       直接用原生 loading="lazy"：自己用 IntersectionObserver 延迟赋 src 会让
+       屏幕外的 img 处于「没有 src」状态，浏览器会把它画成破图 + alt 文本。 */
+
+    /* ==================== 渲染：分类 ==================== */
+    function renderChips(cats) {
+      els.chips.innerHTML = '';
+      if (!cats || cats.length <= 1) {
+        els.chips.hidden = true;
+        return;
+      }
+      els.chips.hidden = false;
+      var frag = document.createDocumentFragment();
+      cats.forEach(function (cat) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip';
+        btn.dataset.cat = cat;
+        btn.textContent = cat;
+        frag.appendChild(btn);
+      });
+      els.chips.appendChild(frag);
+      syncChips();
+    }
+    function syncChips() {
+      var all = els.chips.querySelectorAll('.chip');
+      for (var i = 0; i < all.length; i++) {
+        var on = all[i].dataset.cat === state.filterCat;
+        all[i].classList.toggle('active', on);
+        all[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+    }
+
+    /* ==================== 渲染：网格 ==================== */
+    function renderSkeletons(n) {
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < n; i++) {
+        var d = document.createElement('div');
+        d.className = 'skel';
+        d.innerHTML = '<div class="skel-thumb"></div>';
+        frag.appendChild(d);
+      }
+      els.grid.innerHTML = '';
+      els.grid.appendChild(frag);
+    }
+
+    function buildCard(item, globalIndex, localIndex) {
+      var card = document.createElement('article');
+      card.className = 'card';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', (item.caption || '图片') + '，' + item.category);
+      card.style.setProperty('--d', Math.min(localIndex, 14) * 26 + 'ms');
+
+      var thumb = document.createElement('div');
+      thumb.className = 'thumb';
+
+      var img = document.createElement('img');
+      img.alt = item.caption || item.category || '图集图片';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.addEventListener('load', function () {
+        thumb.classList.add('is-loaded');
+      });
+      img.addEventListener('error', function () {
+        thumb.classList.add('is-error');
+      });
+      img.src = item.url;
+      thumb.appendChild(img);
+
+      var info = document.createElement('div');
+      info.className = 'card-info';
+      var title = document.createElement('h3');
+      title.className = 'card-title';
+      title.textContent = item.caption || '未命名';
+      var cat = document.createElement('p');
+      cat.className = 'card-category';
+      cat.textContent = item.category || '';
+      info.appendChild(title);
+      info.appendChild(cat);
+
+      card.appendChild(thumb);
+      card.appendChild(info);
+
+      card.addEventListener('click', function () { openLightbox(globalIndex, card); });
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox(globalIndex, card);
         }
       });
-    }, { rootMargin: '180px' });
+      return card;
+    }
 
-    function renderChips() {
-      const cats = uniqueCats(state.data);
-      els.chips.innerHTML = '';
-      cats.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'chip' + (cat === state.filterCat ? ' active' : '');
-        btn.textContent = cat;
-        btn.onclick = () => {
-          state.filterCat = cat;
-          state.page = 1;
-          els.grid.classList.remove('loaded');
-          setTimeout(() => {
-            renderGrid();
-            els.grid.classList.add('loaded');
-          }, 50);
-          els.chips.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.textContent === cat));
-        };
-        els.chips.appendChild(btn);
-      });
+    function emptyState() {
+      var hasFilter = state.q.trim() !== '' || state.filterCat !== '全部';
+      var wrap = document.createElement('div');
+      wrap.className = 'empty';
+
+      var emoji = document.createElement('span');
+      emoji.className = 'emoji';
+      emoji.textContent = hasFilter ? '🔍' : '🖼️';
+      var title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = hasFilter ? '没有找到匹配的图片' : '图集里还没有图片';
+      var p = document.createElement('p');
+      p.innerHTML = hasFilter
+        ? '换个关键词，或切回「全部」分类试试。'
+        : '在 <code>photos.json</code> 中添加分类和图片后刷新即可。';
+
+      wrap.appendChild(emoji);
+      wrap.appendChild(title);
+      wrap.appendChild(p);
+
+      if (hasFilter) {
+        var actions = document.createElement('div');
+        actions.className = 'actions';
+        var clear = document.createElement('button');
+        clear.type = 'button';
+        clear.className = 'btn';
+        clear.textContent = '清除筛选';
+        clear.addEventListener('click', resetFilters);
+        actions.appendChild(clear);
+        wrap.appendChild(actions);
+      }
+      return wrap;
+    }
+
+    function errorState() {
+      var wrap = document.createElement('div');
+      wrap.className = 'empty';
+
+      var emoji = document.createElement('span');
+      emoji.className = 'emoji';
+      emoji.textContent = '📂';
+      var title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = '无法读取 photos.json';
+
+      var p = document.createElement('p');
+      p.innerHTML = '请确认 photos.json 与页面位于同一目录，<br>或用本地服务器（如 VS Code Live Server）打开此页面。';
+
+      var actions = document.createElement('div');
+      actions.className = 'actions';
+
+      var retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'btn';
+      retry.textContent = '重新加载';
+      retry.addEventListener('click', function () { init(); });
+
+      var demo = document.createElement('button');
+      demo.type = 'button';
+      demo.className = 'btn';
+      demo.textContent = '先看演示数据';
+      demo.addEventListener('click', function () { useDemo(null); });
+
+      actions.appendChild(retry);
+      actions.appendChild(demo);
+
+      wrap.appendChild(emoji);
+      wrap.appendChild(title);
+      wrap.appendChild(p);
+      wrap.appendChild(actions);
+      return wrap;
     }
 
     function renderGrid() {
-      const q = state.q.trim().toLowerCase();
-      let list = state.flat.filter(item => {
-        const passCat = state.filterCat === '全部' || item.category === state.filterCat;
-        const passQ = !q || (item.caption && item.caption.toLowerCase().includes(q)) || (item.category && item.category.toLowerCase().includes(q));
-        return passCat && passQ;
-      });
-      // 随机打乱
-      list = list.sort(() => Math.random() - 0.5);
-      state.visible = list;
+      var start = (state.page - 1) * state.pageSize;
+      var items = state.visible.slice(start, start + state.pageSize);
 
-      const start = (state.page - 1) * state.pageSize;
-      const pageItems = list.slice(start, start + state.pageSize);
-      const grid = els.grid;
-      grid.innerHTML = '';
+      els.grid.innerHTML = '';
 
-      if (pageItems.length === 0) {
-        grid.innerHTML = `<div class="loading-tip" style="grid-column:1/-1;padding:40px 20px;">😅 没有找到匹配的图片</div>`;
-        grid.classList.add('loaded');
+      if (!items.length) {
+        els.grid.appendChild(emptyState());
         return;
       }
 
-      pageItems.forEach((item, idx) => {
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.style.animationDelay = `${idx * 30}ms`;
-        const thumb = document.createElement('div');
-        thumb.className = 'thumb';
-        const img = document.createElement('img');
-        img.alt = item.caption || '壁纸';
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.dataset.src = item.url;
-        io.observe(img);
-        thumb.appendChild(img);
-
-        const info = document.createElement('div');
-        info.className = 'card-info';
-        const title = document.createElement('h3');
-        title.className = 'card-title';
-        title.textContent = item.caption || '';
-        const cat = document.createElement('p');
-        cat.className = 'card-category';
-        cat.textContent = item.category || '';
-        info.appendChild(title);
-        info.appendChild(cat);
-
-        card.appendChild(thumb);
-        card.appendChild(info);
-        card.onclick = () => openLightbox(start + idx);
-        grid.appendChild(card);
-      });
-
-      renderPagination(list.length);
-      requestAnimationFrame(() => {
-        grid.classList.add('loaded');
-      });
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < items.length; i++) {
+        frag.appendChild(buildCard(items[i], start + i, i));
+      }
+      els.grid.appendChild(frag);
     }
 
-    function renderPagination(total) {
-      const totalPages = Math.ceil(total / state.pageSize) || 1;
-      let html = '';
-      html += `<button class="page-btn" ${state.page===1?'disabled':''} data-page="${state.page-1}">‹</button>`;
+    /* ==================== 渲染：分页 ==================== */
+    function pageButtons(totalPages) {
+      var cur = state.page;
+      var parts = [];
+      parts.push('<button class="page-btn" type="button" data-page="' + (cur - 1) + '"' +
+        ' aria-label="上一页"' + (cur === 1 ? ' disabled' : '') + '>‹</button>');
+
+      function add(p) {
+        parts.push('<button class="page-btn' + (p === cur ? ' active' : '') + '" type="button"' +
+          ' data-page="' + p + '" aria-label="第 ' + p + ' 页"' +
+          (p === cur ? ' aria-current="page"' : '') + '>' + p + '</button>');
+      }
+      function dots() {
+        parts.push('<span class="ellipsis" aria-hidden="true">…</span>');
+      }
+
       if (totalPages <= 7) {
-        for (let i = 1; i <= totalPages; i++) {
-          html += `<button class="page-btn ${i===state.page?'active':''}" data-page="${i}">${i}</button>`;
-        }
+        for (var i = 1; i <= totalPages; i++) add(i);
       } else {
-        if (state.page > 3) {
-          html += `<button class="page-btn" data-page="1">1</button>`;
-          if (state.page > 4) html += `<span class="ellipsis">…</span>`;
+        add(1);
+        var start = Math.max(2, cur - 1);
+        var end = Math.min(totalPages - 1, cur + 1);
+        // 保证窗口至少 3 格，避免出现「1 2 … 20」这种跳空
+        while (end - start < 2) {
+          if (end < totalPages - 1) end++;
+          else if (start > 2) start--;
+          else break;
         }
-        let start = Math.max(2, state.page - 2);
-        let end = Math.min(totalPages - 1, state.page + 2);
-        for (let i = start; i <= end; i++) {
-          html += `<button class="page-btn ${i===state.page?'active':''}" data-page="${i}">${i}</button>`;
-        }
-        if (state.page < totalPages - 2) {
-          if (state.page < totalPages - 3) html += `<span class="ellipsis">…</span>`;
-          html += `<button class="page-btn" data-page="${totalPages}">${totalPages}</button>`;
-        }
+        if (start > 2) dots();
+        for (var k = start; k <= end; k++) add(k);
+        if (end < totalPages - 1) dots();
+        add(totalPages);
       }
-      html += `<button class="page-btn" ${state.page===totalPages?'disabled':''} data-page="${state.page+1}">›</button>`;
 
-      let pag = document.querySelector('.pagination');
-      if (!pag) {
-        pag = document.createElement('div');
-        pag.className = 'pagination';
-        els.grid.parentNode.appendChild(pag);
-      }
-      pag.innerHTML = html;
-      pag.onclick = (e) => {
-        const btn = e.target.closest('.page-btn');
-        if (!btn) return;
-        const page = Number(btn.dataset.page);
-        if (page >= 1 && page <= totalPages && page !== state.page) {
-          state.page = page;
-          els.grid.classList.remove('loaded');
-          setTimeout(() => {
-            renderGrid();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }, 80);
-        }
-      };
+      parts.push('<button class="page-btn" type="button" data-page="' + (cur + 1) + '"' +
+        ' aria-label="下一页"' + (cur === totalPages ? ' disabled' : '') + '>›</button>');
+      return parts.join('');
     }
 
-    // 更新图片数量
-    function updateCount() {
-      els.countDisplay.textContent = `共 ${state.flat.length} 张图片`;
+    function renderPagination() {
+      var total = state.visible.length;
+      var totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+
+      /* 只在一张都没有时隐藏；单页也显示页码，和原来的行为一致 */
+      if (total === 0) {
+        els.pagination.hidden = true;
+        els.pagination.innerHTML = '';
+        updatePagHeight();
+        return;
+      }
+
+      var hadFocus = els.pagination.contains(document.activeElement);
+      els.pagination.hidden = false;
+      els.pagination.innerHTML = pageButtons(totalPages);
+      updatePagHeight();
+
+      if (hadFocus) {
+        var active = els.pagination.querySelector('.page-btn.active');
+        if (active) active.focus({ preventScroll: true });
+      }
     }
 
-    // -------------------- 灯箱 --------------------
-    let currentIdx = 0;
-    function openLightbox(idx) {
-      const item = state.visible[idx];
+    function updatePagHeight() {
+      var h = els.pagination.hidden ? 0 : els.pagination.offsetHeight;
+      root.style.setProperty('--pag-h', h + 'px');
+    }
+
+    /* ==================== 数量 & 状态播报 ==================== */
+    function renderCount() {
+      var total = state.flat.length;
+      var shown = state.visible.length;
+      if (state.isDemo) {
+        els.countDisplay.textContent = '演示数据 · ' + shown + ' 张';
+        return;
+      }
+      els.countDisplay.textContent = (shown === total)
+        ? ('共 ' + total + ' 张图片')
+        : ('筛选出 ' + shown + ' / ' + total + ' 张');
+    }
+
+    function announce() {
+      var total = state.visible.length;
+      var totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+      els.status.textContent = total
+        ? ('第 ' + state.page + ' / ' + totalPages + ' 页，共 ' + total + ' 张图片')
+        : '没有符合条件的图片';
+    }
+
+    /* ==================== 筛选 & 更新 ==================== */
+    function applyFilters() {
+      var q = state.q.trim().toLowerCase();
+      var filtered = state.flat.filter(function (item) {
+        var passCat = state.filterCat === '全部' || item.category === state.filterCat;
+        if (!passCat) return false;
+        if (!q) return true;
+        return (item.caption && item.caption.toLowerCase().indexOf(q) >= 0) ||
+               (item.category && item.category.toLowerCase().indexOf(q) >= 0);
+      });
+
+      state.visible = shuffled(filtered, state.filterCat + '|' + q + '|' + filtered.length);
+
+      var totalPages = Math.max(1, Math.ceil(state.visible.length / state.pageSize));
+      if (state.page > totalPages) state.page = totalPages;
+      if (state.page < 1) state.page = 1;
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    }
+
+    function update(opts) {
+      opts = opts || {};
+      applyFilters();
+      renderGrid();
+      renderPagination();
+      renderCount();
+      announce();
+      syncURL();
+      if (opts.scrollTop) scrollToTop();
+    }
+
+    function resetFilters() {
+      state.q = '';
+      state.filterCat = '全部';
+      state.page = 1;
+      els.q.value = '';
+      els.clearQ.hidden = true;
+      syncChips();
+      update({ scrollTop: true });
+    }
+
+    /* ==================== URL 状态（刷新 / 分享保留） ==================== */
+    function canUseHistory() {
+      return location.protocol !== 'file:' && !!(window.history && history.replaceState);
+    }
+    function readURLState() {
+      if (!canUseHistory()) return {};
+      var out = {};
+      try {
+        var p = new URLSearchParams(location.search);
+        var q = p.get('q');
+        var cat = p.get('cat');
+        var page = parseInt(p.get('page'), 10);
+        if (q) out.q = q;
+        if (cat) out.cat = cat;
+        if (page > 0) out.page = page;
+      } catch (e) { /* 忽略非法 URL */ }
+      return out;
+    }
+    function syncURL() {
+      if (!canUseHistory()) return;
+      var p = new URLSearchParams();
+      if (state.filterCat !== '全部') p.set('cat', state.filterCat);
+      if (state.q.trim()) p.set('q', state.q.trim());
+      if (state.page > 1) p.set('page', String(state.page));
+      var qs = p.toString();
+      var url = location.pathname + (qs ? '?' + qs : '');
+      try { history.replaceState(null, '', url); } catch (e) { /* 忽略 */ }
+    }
+
+    /* ==================== 灯箱 ==================== */
+    var lbIndex = 0;
+    var lbOpen = false;
+    var lastFocus = null;
+    var preloaded = new Set();
+
+    function preloadNeighbors() {
+      [-1, 1].forEach(function (d) {
+        var it = state.visible[lbIndex + d];
+        if (!it || preloaded.has(it.url)) return;
+        preloaded.add(it.url);
+        var im = new Image();
+        im.src = it.url;
+      });
+    }
+
+    function setNavState() {
+      var len = state.visible.length;
+      els.prev.disabled = lbIndex <= 0;
+      els.next.disabled = lbIndex >= len - 1;
+      els.download.disabled = !state.visible[lbIndex];
+    }
+
+    function showLbImage() {
+      var item = state.visible[lbIndex];
       if (!item) return;
-      currentIdx = idx;
-      els.lb.classList.add('open');
+
+      els.lbImg.hidden = true;
+      els.lbError.hidden = true;
+      els.lbSpinner.hidden = false;
       els.lbImg.src = item.url;
+      els.lbImg.alt = item.caption || '图片预览';
       els.lbCap.textContent = item.caption || '';
-      els.lb.dataset.url = item.url;
-    }
-    function closeLightbox() {
-      els.lb.classList.remove('open');
-      els.lbImg.src = '';
-    }
-    function nav(delta) {
-      const idx = currentIdx + delta;
-      if (idx < 0 || idx >= state.visible.length) return;
-      currentIdx = idx;
-      const item = state.visible[idx];
-      els.lbImg.src = item.url;
-      els.lbCap.textContent = item.caption || '';
-      els.lb.dataset.url = item.url;
+      els.lbCounter.textContent = (lbIndex + 1) + ' / ' + state.visible.length;
+
+      setNavState();
+      preloadNeighbors();
     }
 
-    els.close.onclick = closeLightbox;
-    els.prev.onclick = () => nav(-1);
-    els.next.onclick = () => nav(1);
-    els.download.onclick = () => {
-      const url = els.lb.dataset.url;
-      if (url) window.open(url, '_blank');
-    };
-    document.addEventListener('keydown', (e) => {
-      if (!els.lb.classList.contains('open')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') nav(-1);
-      if (e.key === 'ArrowRight') nav(1);
+    els.lbImg.addEventListener('load', function () {
+      els.lbSpinner.hidden = true;
+      els.lbError.hidden = true;
+      els.lbImg.hidden = false;
     });
-    els.lb.addEventListener('click', (e) => {
+    els.lbImg.addEventListener('error', function () {
+      els.lbSpinner.hidden = true;
+      els.lbImg.hidden = true;
+      els.lbError.hidden = false;
+    });
+
+    function openLightbox(idx, opener) {
+      var item = state.visible[idx];
+      if (!item) return;
+      lbIndex = idx;
+      lbOpen = true;
+      // 记住触发灯箱的卡片本身，而不是 activeElement（合成点击时焦点可能还在 body）
+      lastFocus = opener || document.activeElement;
+
+      var sb = window.innerWidth - root.clientWidth;
+      if (sb > 0) root.style.setProperty('--sb', sb + 'px');
+      root.classList.add('lb-open');
+      els.lb.classList.add('open');
+
+      showLbImage();
+
+      // 等过渡开始后再移焦，避免滚动跳位
+      els.close.focus({ preventScroll: true });
+    }
+
+    function closeLightbox() {
+      if (!lbOpen) return;
+      lbOpen = false;
+      els.lb.classList.remove('open');
+      root.classList.remove('lb-open');
+      root.style.setProperty('--sb', '0px');
+
+      if (lastFocus && document.contains(lastFocus)) {
+        lastFocus.focus({ preventScroll: true });
+      }
+      lastFocus = null;
+
+      // 过渡结束后再清空 src，避免浏览器把空 src 当成页面地址去请求
+      window.setTimeout(function () {
+        if (!lbOpen) {
+          els.lbImg.hidden = true;
+          els.lbImg.removeAttribute('src');
+        }
+      }, reduceMotion.matches ? 0 : 320);
+    }
+
+    function nav(delta) {
+      var idx = lbIndex + delta;
+      if (idx < 0 || idx >= state.visible.length) return;
+      lbIndex = idx;
+      showLbImage();
+    }
+
+    function lbFocusables() {
+      return Array.prototype.filter.call(
+        els.lb.querySelectorAll('button:not([disabled])'),
+        function (el) { return el.offsetParent !== null; }
+      );
+    }
+
+    function trapTab(e) {
+      var f = lbFocusables();
+      if (!f.length) return;
+      var first = f[0];
+      var last = f[f.length - 1];
+      var active = document.activeElement;
+      if (!els.lb.contains(active)) {
+        e.preventDefault();
+        first.focus();
+        return;
+      }
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    els.close.addEventListener('click', closeLightbox);
+    els.prev.addEventListener('click', function () { nav(-1); });
+    els.next.addEventListener('click', function () { nav(1); });
+    els.download.addEventListener('click', function () {
+      var item = state.visible[lbIndex];
+      if (!item) return;
+      var name = (item.caption || 'image').replace(/[\\/:*?"<>|]/g, '_');
+      var m = /\.(png|jpe?g|webp|gif|avif|bmp)(?:[?#]|$)/i.exec(item.url || '');
+      name += m ? ('.' + m[1].toLowerCase()) : '.png';
+      var a = document.createElement('a');
+      a.href = item.url;
+      a.download = name;
+      a.rel = 'noopener';
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!lbOpen) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); nav(-1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); nav(1); }
+      else if (e.key === 'Tab') { trapTab(e); }
+    });
+
+    els.lb.addEventListener('click', function (e) {
       if (e.target === els.lb) closeLightbox();
     });
 
-    // -------------------- 搜索 --------------------
-    els.q.addEventListener('input', () => {
-      state.q = els.q.value;
+    // 触屏左右滑动切换
+    var touchStartX = null, touchStartY = null;
+    els.lbStage.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    els.lbStage.addEventListener('touchend', function (e) {
+      if (touchStartX === null) return;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - touchStartX;
+      var dy = t.clientY - touchStartY;
+      touchStartX = touchStartY = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        nav(dx < 0 ? 1 : -1);
+      }
+    }, { passive: true });
+
+    /* ==================== 交互绑定 ==================== */
+    els.chips.addEventListener('click', function (e) {
+      var btn = e.target.closest('.chip');
+      if (!btn) return;
+      var cat = btn.dataset.cat;
+      if (!cat || cat === state.filterCat) return;
+      state.filterCat = cat;
       state.page = 1;
-      els.grid.classList.remove('loaded');
-      setTimeout(() => {
-        renderGrid();
-        els.grid.classList.add('loaded');
-      }, 60);
+      syncChips();
+      update({ scrollTop: true });
     });
 
-    // -------------------- 数据加载 --------------------
-    async function fetchData() {
-      // 尝试多个路径
-      const paths = ['photos.json', './photos.json', '/photos.json'];
-      for (const path of paths) {
-        try {
-          const res = await fetch(path + '?t=' + Date.now());
-          if (res.ok) {
-            const json = await res.json();
-            return json;
-          }
-        } catch (_) { /* 继续尝试 */ }
+    els.pagination.addEventListener('click', function (e) {
+      var btn = e.target.closest('.page-btn');
+      if (!btn || btn.disabled) return;
+      var page = Number(btn.dataset.page);
+      var totalPages = Math.max(1, Math.ceil(state.visible.length / state.pageSize));
+      if (!Number.isFinite(page) || page < 1 || page > totalPages || page === state.page) return;
+      state.page = page;
+      update({ scrollTop: true });
+    });
+
+    // 输入防抖：连续输入只重绘一次
+    var searchTimer = null;
+    els.q.addEventListener('input', function () {
+      var v = els.q.value;
+      els.clearQ.hidden = !v;
+      window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(function () {
+        state.q = v;
+        state.page = 1;
+        update();
+      }, 140);
+    });
+    els.q.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && els.q.value) {
+        e.preventDefault();
+        els.q.value = '';
+        els.clearQ.hidden = true;
+        state.q = '';
+        state.page = 1;
+        update();
       }
-      return null;
+    });
+    els.clearQ.addEventListener('click', function () {
+      els.q.value = '';
+      els.clearQ.hidden = true;
+      state.q = '';
+      state.page = 1;
+      els.q.focus();
+      update();
+    });
+
+    els.noticeClose.addEventListener('click', function () {
+      els.notice.hidden = true;
+    });
+
+    window.addEventListener('resize', updatePagHeight);
+
+    /* ==================== 演示数据（离线也能看效果） ==================== */
+    function svgTile(label, hue) {
+      var svg =
+        "<svg xmlns='http://www.w3.org/2000/svg' width='800' height='496' viewBox='0 0 800 496'>" +
+        "<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>" +
+        "<stop offset='0' stop-color='hsl(" + hue + " 68% 62%)'/>" +
+        "<stop offset='1' stop-color='hsl(" + (hue + 42) + " 68% 44%)'/>" +
+        "</linearGradient></defs>" +
+        "<rect width='800' height='496' fill='url(#g)'/>" +
+        "<circle cx='636' cy='104' r='156' fill='white' opacity='0.12'/>" +
+        "<circle cx='150' cy='404' r='96' fill='white' opacity='0.08'/>" +
+        "<text x='48' y='430' font-family='system-ui, sans-serif' font-size='42' fill='white' opacity='0.92'>" + label + "</text>" +
+        "</svg>";
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    function demoData() {
+      var captions = [
+        '晨雾中的街道', '海边的黄昏', '旧书店的窗', '雨后的天台', '山谷里的光', '夜行列车',
+        '安静的午后', '风穿过麦田', '城市上空', '雪落的顺序', '灯下的猫', '木栈道尽头',
+        '远山的轮廓', '空教室', '玻璃与光', '潮汐退去', '屋顶花园', '午夜的便利店',
+        '蓝调时刻', '楼梯转角', '风铃', '纸上月光', '候鸟', '沙丘',
+        '退潮的礁石', '清晨的站台'
+      ];
+      var cats = [
+        { name: '示例 · 城市', hue: 222 },
+        { name: '示例 · 自然', hue: 152 },
+        { name: '示例 · 静物', hue: 278 }
+      ];
+      var buckets = cats.map(function (c) { return { category: c.name, photos: [] }; });
+      captions.forEach(function (caption, i) {
+        var ci = i % cats.length;
+        buckets[ci].photos.push({
+          url: svgTile(caption, cats[ci].hue + (i * 5) % 36),
+          caption: caption
+        });
+      });
+      return buckets;
+    }
+
+    function showNotice(text) {
+      els.noticeText.textContent = text;
+      els.notice.hidden = false;
+    }
+
+    function useDemo(noticeText) {
+      state.isDemo = true;
+      if (noticeText) showNotice(noticeText);
+      applyData(demoData());
+    }
+
+    /* ==================== 数据加载 ==================== */
+    function fetchData() {
+      var paths = ['photos.json'];
+      var idx = 0;
+
+      function attempt() {
+        if (idx >= paths.length) return Promise.resolve(null);
+        var path = paths[idx++];
+        var ctrl = ('AbortController' in window) ? new AbortController() : null;
+        var timer = window.setTimeout(function () { if (ctrl) ctrl.abort(); }, 7000);
+
+        return fetch(path, {
+          cache: 'no-cache',
+          signal: ctrl ? ctrl.signal : undefined
+        }).then(function (res) {
+          window.clearTimeout(timer);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        }).catch(function () {
+          window.clearTimeout(timer);
+          return attempt();
+        });
+      }
+      return attempt();
     }
 
     function applyData(raw) {
-      const norm = normalize(raw);
-      state.data = norm.length ? norm : [];
-      state.flat = buildFlat(state.data);
-      state.filterCat = '全部';
-      state.q = '';
-      state.page = 1;
-      updateCount();
-      renderChips();
-      renderGrid();
+      var norm = normalize(raw);
+      state.data = norm;
+      state.flat = buildFlat(norm);
+
+      var urlState = readURLState();
+      state.q = urlState.q || '';
+      state.page = urlState.page || 1;
+      els.q.value = state.q;
+      els.clearQ.hidden = !state.q;
+
+      var cats = uniqueCats(norm);
+      state.filterCat = (urlState.cat && cats.indexOf(urlState.cat) >= 0) ? urlState.cat : '全部';
+
+      if (!state.isDemo) els.notice.hidden = true;
+
+      renderChips(cats);
+      update();
     }
 
-    // -------------------- 初始化 --------------------
-    (async function init() {
-      const json = await fetchData();
-      if (json) {
-        applyData(json);
-      } else {
-        // 如果读取失败，显示提示
-        els.grid.innerHTML = `
-          <div class="loading-tip" style="grid-column:1/-1;padding:60px 20px;">
-            <div style="font-size:48px;margin-bottom:16px;">📂</div>
-            <div style="font-size:16px;font-weight:500;margin-bottom:8px;">无法读取 photos.json</div>
-            <div style="font-size:14px;color:var(--muted);">
-              请确保 photos.json 文件存在于页面同级目录下，<br>
-              或使用本地服务器（如 Live Server）运行此页面。
-            </div>
-          </div>
-        `;
-        els.grid.classList.add('loaded');
-        els.countDisplay.textContent = '加载失败';
-        // 用兜底数据
-        const fallback = [
-          { category: "示例分类", photos: [
-            { url: "https://placekitten.com/400/300", caption: "示例图片1" },
-            { url: "https://placekitten.com/401/300", caption: "示例图片2" }
-          ]}
-        ];
-        applyData(fallback);
-      }
-    })();
+    /* ==================== 初始化 ==================== */
+    var loading = false;
+    function init() {
+      if (loading) return;
+      loading = true;
 
+      els.notice.hidden = true;
+      els.countDisplay.textContent = '加载中…';
+      els.status.textContent = '';
+      state.isDemo = false;
+      renderSkeletons(8);
+      els.pagination.hidden = true;
+      updatePagHeight();
+
+      fetchData().then(function (json) {
+        loading = false;
+        if (json) {
+          applyData(json);
+          return;
+        }
+        // 本地双击打开（file://）时浏览器一定拒绝 fetch，直接给演示数据
+        if (location.protocol === 'file:') {
+          useDemo('当前是本地文件模式，浏览器不读取 photos.json，正在显示演示数据。用本地服务器打开即可看到真实图集。');
+          return;
+        }
+        els.grid.innerHTML = '';
+        els.grid.appendChild(errorState());
+        els.chips.innerHTML = '';
+        els.chips.hidden = true;
+        els.countDisplay.textContent = '加载失败';
+        els.pagination.hidden = true;
+        updatePagHeight();
+      }).catch(function () {
+        loading = false;
+        els.grid.innerHTML = '';
+        els.grid.appendChild(errorState());
+        els.countDisplay.textContent = '加载失败';
+      });
+    }
+
+    init();
   })();
 </script>
 </body>
