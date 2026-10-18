@@ -37,7 +37,10 @@
 | `deepseek_html and gemini.html` | AI 相关实验页面 |
 | `人物介绍模板.html` | 人物介绍模板页面 |
 | `runoob-test.html` | 测试页面 |
+| `photos.json` | 图集数据（分类 + 图片列表），由上面两个页面读取 |
+| `photostool/` | `photos.json` 编辑器（本地工具，部署时被 `_config.yml` 排除） |
 | `image/` | 图片资源目录 |
+| `_config.yml` | GitHub Pages 配置（目前只做 `exclude: photostool`） |
 | `README.md` | 项目说明（简短） |
 
 ## Git 工作流
